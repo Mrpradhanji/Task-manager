@@ -10,6 +10,7 @@ import SignUp from './components/SignUp';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import LandingPage from './pages/LandingPage';
+import Calendar from './pages/Calendar';
 import './index.css';
 
 const App = () => {
@@ -181,6 +182,7 @@ const App = () => {
         element={<ProtectedLayout />}
       >
         <Route index element={<Dashboard />} />
+        <Route path="calendar" element={<Calendar />} />
         <Route path="pending" element={<Pending />} />
         <Route path="complete" element={<Complete />} />
       </Route>

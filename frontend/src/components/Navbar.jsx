@@ -43,8 +43,8 @@ export default function Navbar({ onLogout, user }) {
           onClick={() => navigate('/dashboard')}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <ClipboardList className="w-6 h-6 text-indigo-600" />
-          <span className="text-lg font-semibold text-gray-900">Task Manager</span>
+          <ClipboardList className="w-6 h-6 text-[#3b82f6]" />
+          <span className="text-lg font-bold text-[#3b82f6]">RTASK</span>
         </button>
 
         {/* Right - User Controls */}

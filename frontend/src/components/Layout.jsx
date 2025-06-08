@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { Outlet } from "react-router-dom"
-import { Circle, TrendingUp, Zap, Clock, CheckCircle2, AlertCircle, BarChart2 } from "lucide-react"
+import { Circle, TrendingUp, Zap, Clock, CheckCircle2, AlertCircle, BarChart2, ChevronRight } from "lucide-react"
 import Navbar from "./Navbar"
 import Sidebar from "./Sidebar"
+import Analytics from "./Analytics"
 import axios from "axios"
 
 const Layout = ({ user, onLogout }) => {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showAnalytics, setShowAnalytics] = useState(true)
 
   const fetchTasks = useCallback(async () => {
     setLoading(true)
@@ -113,14 +115,6 @@ const Layout = ({ user, onLogout }) => {
     }
   }, [tasks, onLogout]);
 
-  // Update context value to include deleteTask
-  const contextValue = useMemo(() => ({
-    tasks,
-    refreshTasks: fetchTasks,
-    updateTask,
-    deleteTask
-  }), [tasks, fetchTasks, updateTask, deleteTask]);
-
   const stats = useMemo(() => {
     const completedTasks = tasks.filter(t => 
       t.completed === true ||
@@ -147,6 +141,11 @@ const Layout = ({ user, onLogout }) => {
     const pendingTrend = pendingCount > 0 ? 0 : 0;
     const completionTrend = completionPercentage > 0 ? 0 : 0;
 
+    // Sort tasks by creation date for recent activity
+    const recentTasks = [...tasks].sort((a, b) => 
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
     return {
       totalCount,
       completedTasks,
@@ -155,9 +154,16 @@ const Layout = ({ user, onLogout }) => {
       totalTrend,
       completedTrend,
       pendingTrend,
-      completionTrend
+      completionTrend,
+      recentTasks
     }
   }, [tasks])
+
+  const contextValue = useMemo(() => ({
+    tasks,
+    refreshTasks: fetchTasks,
+    user
+  }), [tasks, fetchTasks, user]);
 
   const StatCard = ({ title, value, icon, color = "blue", trend = null }) => (
     <div className="p-3 rounded-xl bg-white border border-gray-100 hover:border-[#3b82f6]/20 transition-all shadow-sm">
@@ -255,95 +261,27 @@ const Layout = ({ user, onLogout }) => {
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <Navbar user={user} onLogout={onLogout} />
-      <Sidebar user={user} tasks={tasks}/>
-
-      <div className="ml-0 xl:ml-64 lg:ml-64 md:ml-16 pt-16 p-3 sm:p-4 md:p-4 transition-all duration-300">
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
-          <div className="xl:col-span-2 space-y-3 sm:space-y-4">
-            <Outlet context={contextValue} />
-          </div>
-
-          <div className="xl:col-span-1 space-y-4 sm:space-y-6">
-            <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100">
-              <h3 className="text-base sm:text-lg font-semibold mb-4 text-[#1e293b] flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#3b82f6]" />
-                Task Analytics
-              </h3>
-
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
-                <StatCard 
-                  title="Total Tasks" 
-                  value={stats.totalCount} 
-                  icon={<Circle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
-                  color="blue"
-                  trend={stats.totalTrend}
-                />
-                <StatCard 
-                  title="Completed" 
-                  value={stats.completedTasks} 
-                  icon={<CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
-                  color="green"
-                  trend={stats.completedTrend}
-                />
-                <StatCard 
-                  title="Pending" 
-                  value={stats.pendingCount} 
-                  icon={<AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
-                  color="blue"
-                  trend={stats.pendingTrend}
-                />
-                <StatCard
-                  title="Completion Rate"
-                  value={`${stats.completionPercentage}%`}
-                  icon={<Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
-                  color="blue"
-                  trend={stats.completionTrend}
-                />
-              </div>
-
-              <hr className="my-4 border-gray-100" />
-
-              <CompletionChart completed={stats.completedTasks} total={stats.totalCount} />
+      <Sidebar user={user} tasks={tasks} />
+      <div className="md:pl-64 pt-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+            <div className="xl:col-span-2 space-y-3 sm:space-y-4">
+              <Outlet context={contextValue} />
             </div>
 
-            <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100">
-              <h3 className="text-base sm:text-lg font-semibold mb-4 text-[#1e293b] flex items-center gap-2">
-                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-[#3b82f6]" />
-                Recent Activity
-              </h3>
-              <div className="space-y-2 sm:space-y-3">
-                {tasks.slice(0, 3).map((task) => (
-                  <div
-                    key={task._id || task.id}
-                    className="flex items-center justify-between p-2 sm:p-3 hover:bg-[#3b82f6]/5 rounded-lg transition-colors duration-200 border border-transparent hover:border-[#3b82f6]/20"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#1e293b] break-words whitespace-normal">
-                        {task.title}
-                      </p>
-                      <p className="text-xs text-[#64748b] mt-0.5">
-                        {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : "No date"}
-                      </p>
-                    </div>
-                    <span className={`px-2 py-1 text-xs rounded-full shrink-0 ml-2 ${
-                      task.completed 
-                        ? 'bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20' 
-                        : 'bg-[#3b82f6]/10 text-[#3b82f6] border border-[#3b82f6]/20'
-                    }`}>
-                      {task.completed ? "Done" : "Pending"}
-                    </span>
-                  </div>
-                ))}
-                {tasks.length === 0 && (
-                  <div className="text-center py-4 sm:py-6 px-2">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-[#3b82f6]/10 flex items-center justify-center">
-                      <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-[#3b82f6]" />
-                    </div>
-                    <p className="text-sm text-[#64748b]">No recent activity</p>
-                    <p className="text-xs text-[#64748b] mt-1">Tasks will appear here</p>
-                  </div>
-                )}
-              </div>
+            {/* Analytics Toggle Button */}
+            <button
+              onClick={() => setShowAnalytics(!showAnalytics)}
+              className="fixed left-4 bottom-20 z-40 p-3 bg-[#3b82f6] text-white rounded-full shadow-lg shadow-[#3b82f6]/20 hover:shadow-[#3b82f6]/30 transition-all duration-300 md:hidden"
+            >
+              <BarChart2 className="w-5 h-5" />
+            </button>
+
+            {/* Analytics Panel */}
+            <div className={`xl:col-span-1 space-y-4 sm:space-y-6 transition-all duration-300 ${
+              showAnalytics ? 'block' : 'hidden'
+            }`}>
+              <Analytics stats={stats} />
             </div>
           </div>
         </div>
