@@ -161,26 +161,18 @@ const App = () => {
       <Route
         path="/forgot-password"
         element={
-          currentUser ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <ForgotPassword onBackToLogin={() => navigate('/login')} />
-            </div>
-          )
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <ForgotPassword onBackToLogin={() => navigate('/login')} />
+          </div>
         }
       />
 
       <Route
         path="/reset-password"
         element={
-          currentUser ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <ResetPassword />
-            </div>
-          )
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <ResetPassword />
+          </div>
         }
       />
 

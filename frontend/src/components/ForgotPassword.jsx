@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const ForgotPassword = ({ onBackToLogin }) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+
+  // Get the current user's email if they're logged in
+  useEffect(() => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser?.email) {
+      setEmail(currentUser.email);
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +35,15 @@ const ForgotPassword = ({ onBackToLogin }) => {
           type: 'success',
           text: data.message || 'If your email is registered, you will receive a password reset link.'
         });
-        setEmail('');
+        // If user is authenticated, redirect back to profile after 2 seconds
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser) {
+          setTimeout(() => {
+            navigate('/profile');
+          }, 2000);
+        } else {
+          setEmail('');
+        }
       } else {
         throw new Error(data.message || 'Failed to process request');
       }
@@ -42,7 +60,7 @@ const ForgotPassword = ({ onBackToLogin }) => {
   return (
     <div className="bg-[#0A0A0A] p-8 rounded-lg shadow-lg w-full max-w-md border border-[#00FFFF]/20">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Forgot Password</h2>
+        <h2 className="text-2xl font-bold text-white mb-2">Reset Password</h2>
         <p className="text-gray-400">Enter your email to reset your password</p>
       </div>
 

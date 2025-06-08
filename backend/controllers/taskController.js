@@ -1,7 +1,7 @@
 import Task from "../models/taskModel.js";
 
 // Create a new task
-export const createTask = async (req, res) => {
+const createTask = async (req, res) => {
     try {
         const { title, description, priority, status, dueDate, completed } = req.body;
         const task = new Task({
@@ -21,7 +21,7 @@ export const createTask = async (req, res) => {
 };
 
 // Get all tasks for logged-in user
-export const getTasks = async (req, res) => {
+const getTasks = async (req, res) => {
     try {
         const tasks = await Task.find({ owner: req.user.id }).sort({ createdAt: -1 });
         res.json({ success: true, tasks });
@@ -31,7 +31,7 @@ export const getTasks = async (req, res) => {
 };
 
 // Get single task by ID (must belong to user)
-export const getTaskById = async (req, res) => {
+const getTaskById = async (req, res) => {
     try {
         const task = await Task.findOne({ _id: req.params.id, owner: req.user.id });
         if (!task) return res.status(404).json({ success: false, message: 'Task not found' });
@@ -42,7 +42,7 @@ export const getTaskById = async (req, res) => {
 };
 
 // Update a task
-export const updateTask = async (req, res) => {
+const updateTask = async (req, res) => {
     try {
         const data = { ...req.body };
         if (data.completed !== undefined) {
@@ -70,7 +70,7 @@ export const updateTask = async (req, res) => {
 };
 
 // Delete a task
-export const deleteTask = async (req, res) => {
+const deleteTask = async (req, res) => {
     try {
         const deleted = await Task.findOneAndDelete({ _id: req.params.id, owner: req.user.id });
         if (!deleted) return res.status(404).json({ success: false, message: 'Task not found or not yours' });
@@ -78,4 +78,52 @@ export const deleteTask = async (req, res) => {
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
+};
+
+// Check if task title is unique
+const checkTitleUnique = async (req, res) => {
+  try {
+    const { title, taskId } = req.body;
+    const userId = req.user.id;
+
+    if (!title) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Title is required' 
+      });
+    }
+
+    // Build query to check for duplicate title
+    const query = {
+      userId,
+      title: { $regex: new RegExp(`^${title}$`, 'i') } // Case-insensitive exact match
+    };
+
+    // If editing a task, exclude the current task from the check
+    if (taskId) {
+      query._id = { $ne: taskId };
+    }
+
+    const existingTask = await Task.findOne(query);
+
+    return res.json({
+      success: true,
+      isUnique: !existingTask
+    });
+  } catch (error) {
+    console.error('Error checking title uniqueness:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Error checking title uniqueness' 
+    });
+  }
+};
+
+export {
+  createTask,
+  getTasks,
+  getTaskById,
+  updateTask,
+  deleteTask,
+  checkTitleUnique
 };

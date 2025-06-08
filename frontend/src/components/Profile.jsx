@@ -2,9 +2,15 @@ import { useState, useEffect, useRef } from "react"
 import axios from "axios"
 import { 
   ChevronLeft, 
+  Shield, 
   LogOut, 
   Save, 
-  Camera
+  UserCircle, 
+  Bell,
+  Camera,
+  Mail,
+  Eye,
+  EyeOff
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { toast, ToastContainer } from "react-toastify"
@@ -22,10 +28,17 @@ const API_URL = "http://localhost:4000"
 
 export default function Profile({ setCurrentUser, onLogout }) {
   const [profile, setProfile] = useState({ name: "", email: "", avatar: "" })
+  const [settings, setSettings] = useState({
+    notifications: true
+  })
   const [isLoading, setIsLoading] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef(null)
   const navigate = useNavigate()
+  const [message, setMessage] = useState(null)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -37,14 +50,18 @@ export default function Profile({ setCurrentUser, onLogout }) {
     const fetchProfile = async () => {
       try {
         setIsLoading(true)
+        console.log('Fetching profile...')
         const { data } = await axios.get(
           `${API_URL}/api/user/me`, 
           { headers: { Authorization: `Bearer ${token}` } }
         )
+        console.log('Profile data received:', data)
         if (data.success) {
           const avatarUrl = data.user.avatar 
             ? `${API_URL}${data.user.avatar}`
             : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=random`
+          
+          console.log('Setting initial avatar URL:', avatarUrl)
           
           setProfile({ 
             name: data.user.name, 
@@ -55,7 +72,11 @@ export default function Profile({ setCurrentUser, onLogout }) {
           toast.error(data.message || "Failed to load profile")
         }
       } catch (error) {
-        console.error('Error fetching profile:', error)
+        console.error('Error fetching profile:', {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status
+        })
         toast.error(error.response?.data?.message || "Unable to load profile")
       } finally {
         setIsLoading(false)
@@ -108,7 +129,7 @@ export default function Profile({ setCurrentUser, onLogout }) {
       )
 
       if (data.success) {
-        // Update both local state and parent state
+        // Update both local state and parent state with the same URL format
         const avatarUrl = data.avatar
         setProfile(prev => ({
           ...prev,
@@ -168,6 +189,15 @@ export default function Profile({ setCurrentUser, onLogout }) {
       console.error('Error updating profile:', err)
       toast.error(err.response?.data?.message || "Profile update failed")
     }
+  }
+
+  const handleSettingChange = (setting, value) => {
+    console.log('Updating setting:', setting, 'to:', value)
+    setSettings(prev => ({
+      ...prev,
+      [setting]: value
+    }))
+    toast.success("Setting updated")
   }
 
   if (isLoading) {
@@ -276,6 +306,201 @@ export default function Profile({ setCurrentUser, onLogout }) {
                 </button>
               </div>
             </form>
+          </div>
+
+          {/* Preferences Section */}
+          <div className={SECTION_WRAPPER}>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Preferences</h2>
+            <div className="space-y-4">
+              {/* Notifications */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <Bell className="h-5 w-5 text-indigo-500" />
+                  <div>
+                    <h3 className="font-medium text-gray-800">Email Notifications</h3>
+                    <p className="text-sm text-gray-500">Receive email updates about your tasks</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.notifications}
+                    onChange={(e) => handleSettingChange('notifications', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Security Section */}
+          <div className={SECTION_WRAPPER}>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Security</h2>
+            <div className="space-y-4">
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3 mb-4">
+                  <Shield className="w-5 h-5 text-indigo-600" />
+                  <div>
+                    <h3 className="font-medium text-gray-900">Update Password</h3>
+                    <p className="text-sm text-gray-500">Change your password here</p>
+                  </div>
+                </div>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.target);
+                  const currentPassword = formData.get('currentPassword');
+                  const newPassword = formData.get('newPassword');
+                  const confirmPassword = formData.get('confirmPassword');
+
+                  if (newPassword !== confirmPassword) {
+                    setMessage({ type: 'error', text: 'New passwords do not match' });
+                    return;
+                  }
+
+                  try {
+                    const response = await fetch('http://localhost:4000/api/user/update-password', {
+                      method: 'PUT',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                      },
+                      body: JSON.stringify({
+                        currentPassword,
+                        newPassword
+                      })
+                    });
+
+                    let data;
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                      data = await response.json();
+                    }
+
+                    if (response.ok) {
+                      setMessage({ type: 'success', text: 'Password updated successfully' });
+                      e.target.reset();
+                      setShowCurrentPassword(false);
+                      setShowNewPassword(false);
+                      setShowConfirmPassword(false);
+                    } else {
+                      if (response.status === 401) {
+                        throw new Error('Current password is incorrect');
+                      } else if (response.status === 400) {
+                        throw new Error(data?.message || 'Invalid password format');
+                      } else if (response.status === 500) {
+                        throw new Error('Server error. Please try again later.');
+                      } else {
+                        throw new Error(data?.message || 'Failed to update password');
+                      }
+                    }
+                  } catch (error) {
+                    console.error('Password update error:', error);
+                    setMessage({ 
+                      type: 'error', 
+                      text: error.message || 'An unexpected error occurred. Please try again.'
+                    });
+                  }
+                }} className="space-y-4">
+                  {message && (
+                    <div className={`px-4 py-3 rounded-lg text-sm ${
+                      message.type === 'success' 
+                        ? 'bg-green-500/10 border border-green-500/20 text-green-500'
+                        : 'bg-red-500/10 border border-red-500/20 text-red-500'
+                    }`}>
+                      {message.text}
+                    </div>
+                  )}
+                  <div>
+                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                      Current Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showCurrentPassword ? "text" : "password"}
+                        id="currentPassword"
+                        name="currentPassword"
+                        required
+                        className={`${INPUT_WRAPPER} pr-10`}
+                        placeholder="Enter current password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                      >
+                        {showCurrentPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                      New Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        id="newPassword"
+                        name="newPassword"
+                        required
+                        minLength="6"
+                        className={`${INPUT_WRAPPER} pr-10`}
+                        placeholder="Enter new password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                      >
+                        {showNewPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                      Confirm New Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        required
+                        minLength="6"
+                        className={`${INPUT_WRAPPER} pr-10`}
+                        placeholder="Confirm new password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className={FULL_BUTTON}
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Update Password
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
 
           {/* Danger Zone */}

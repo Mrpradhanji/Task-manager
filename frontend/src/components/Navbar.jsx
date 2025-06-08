@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from "react"
-import { Settings, ChevronDown, LogOut, ClipboardList, Moon, Sun } from "lucide-react"
+import { Settings, ChevronDown, LogOut, ClipboardList } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export default function Navbar({ onLogout, user }) {
   const [isMenuOpen, setMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(false)
   const menuRef = useRef(null)
   const navigate = useNavigate()
 
@@ -24,11 +23,6 @@ export default function Navbar({ onLogout, user }) {
     onLogout()
   }
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode)
-    // Dark mode functionality will be implemented later
-  }
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -45,29 +39,16 @@ export default function Navbar({ onLogout, user }) {
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
       <div className="flex items-center justify-between px-4 py-3 md:px-6 max-w-7xl mx-auto">
         {/* Left - Logo + Brand */}
-        <div 
-          className="flex items-center gap-2 cursor-pointer"
+        <button 
           onClick={() => navigate('/dashboard')}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <ClipboardList className="w-6 h-6 text-indigo-600" />
           <span className="text-lg font-semibold text-gray-900">Task Manager</span>
-        </div>
+        </button>
 
         {/* Right - User Controls */}
         <div className="flex items-center gap-4">
-          {/* Dark Mode Toggle */}
-          <button
-            onClick={toggleDarkMode}
-            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            aria-label="Toggle dark mode"
-          >
-            {isDarkMode ? (
-              <Sun className="h-5 w-5 text-indigo-500" />
-            ) : (
-              <Moon className="h-5 w-5 text-indigo-500" />
-            )}
-          </button>
-
           {/* User Menu */}
           <div className="relative" ref={menuRef}>
             <button
