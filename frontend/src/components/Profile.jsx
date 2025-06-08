@@ -122,23 +122,11 @@ export default function Profile({ setCurrentUser, onLogout }) {
               <Shield className="text-purple-500 w-5 h-5" />
               <h2 className="text-xl font-semibold text-gray-800">Security</h2>
             </div>
-            <form onSubmit={changePassword} className="space-y-4">
-              {securityFields.map(({ name, placeholder }) => (
-                <div key={name} className={INPUT_WRAPPER}>
-                  <Lock className="text-purple-500 w-5 h-5 mr-2" />
-                  <input
-                    type="password"
-                    placeholder={placeholder}
-                    value={passwords[name]}
-                    onChange={(e) =>
-                      setPasswords({ ...passwords, [name]: e.target.value })
-                    }
-                    className="w-full text-sm focus:outline-none"
-                    required
-                  />
-                </div>
-              ))}
-              <button className={FULL_BUTTON}>
+            <div className="space-y-4">
+              <button 
+                onClick={() => navigate('/forgot-password')} 
+                className={FULL_BUTTON}
+              >
                 <Shield className="w-4 h-4" /> Change Password
               </button>
 
@@ -150,7 +138,7 @@ export default function Profile({ setCurrentUser, onLogout }) {
                   Logout
                 </button>
               </div>
-            </form>
+            </div>
           </section>
         </div>
       </div>

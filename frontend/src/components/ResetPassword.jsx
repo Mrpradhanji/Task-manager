@@ -15,19 +15,32 @@ const ResetPassword = () => {
   const token = searchParams.get('token');
 
   useEffect(() => {
+    console.log('Reset Password Component Mounted');
+    console.log('Token from URL:', token);
+    
     if (!token) {
+      console.log('No token found in URL');
       setMessage({
         type: 'error',
         text: 'Invalid or missing reset token. Please request a new password reset link.'
       });
+    } else {
+      console.log('Token found in URL');
     }
   }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!token) return;
+    console.log('Form submitted');
+    console.log('Token:', token);
+    
+    if (!token) {
+      console.log('No token available for submission');
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
+      console.log('Passwords do not match');
       setMessage({
         type: 'error',
         text: 'Passwords do not match'
@@ -36,6 +49,7 @@ const ResetPassword = () => {
     }
 
     if (formData.password.length < 8) {
+      console.log('Password too short');
       setMessage({
         type: 'error',
         text: 'Password must be at least 8 characters long'
@@ -47,6 +61,7 @@ const ResetPassword = () => {
     setMessage({ type: '', text: '' });
 
     try {
+      console.log('Sending reset password request to backend');
       const response = await fetch('http://localhost:4000/api/user/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,8 +72,10 @@ const ResetPassword = () => {
       });
 
       const data = await response.json();
+      console.log('Backend response:', data);
 
       if (response.ok) {
+        console.log('Password reset successful');
         setMessage({
           type: 'success',
           text: 'Password has been reset successfully. Redirecting to login...'
@@ -68,9 +85,11 @@ const ResetPassword = () => {
           navigate('/login');
         }, 3000);
       } else {
+        console.log('Password reset failed:', data.message);
         throw new Error(data.message || 'Failed to reset password');
       }
     } catch (error) {
+      console.error('Error during password reset:', error);
       setMessage({
         type: 'error',
         text: error.message || 'An error occurred. Please try again.'
