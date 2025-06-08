@@ -155,18 +155,27 @@ const Login = ({ onSubmit, onSwitchMode }) => {
           </div>
         </div>
 
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="rememberMe"
-            name="rememberMe"
-            checked={formData.rememberMe}
-            onChange={handleChange}
-            className="h-4 w-4 rounded border-[#00FFFF]/20 bg-[#0A0A0A] text-[#00FFFF] focus:ring-[#00FFFF] focus:ring-offset-[#0A0A0A]"
-          />
-          <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-300">
-            Remember me
-          </label>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              name="rememberMe"
+              checked={formData.rememberMe}
+              onChange={handleChange}
+              className="h-4 w-4 rounded border-[#00FFFF]/20 bg-[#0A0A0A] text-[#00FFFF] focus:ring-[#00FFFF] focus:ring-offset-[#0A0A0A]"
+            />
+            <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-300">
+              Remember me
+            </label>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/forgot-password')}
+            className="text-sm text-[#00FFFF] hover:text-[#00FFFF]/80 font-medium transition-colors"
+          >
+            Forgot Password?
+          </button>
         </div>
 
         <button

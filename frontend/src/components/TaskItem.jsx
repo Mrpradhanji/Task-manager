@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { useOutletContext } from "react-router-dom"
 import { format, isToday } from "date-fns"
 import TaskModal from "./AddTask"
+import DeleteConfirmationModal from "./DeleteConfirmationModal"
 import { 
   getPriorityColor, 
   getPriorityBadgeColor, 
@@ -13,10 +14,11 @@ import {
 import { CheckCircle2, MoreVertical, Clock, Calendar, ChevronDown } from "lucide-react"
 
 const TaskItem = ({ task, onLogout, showCompleteCheckbox = true }) => {
-  const { updateTask } = useOutletContext();
+  const { updateTask, deleteTask } = useOutletContext();
   const [showMenu, setShowMenu] = useState(false)
   const [showStatusDropdown, setShowStatusDropdown] = useState(false)
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const menuRef = useRef(null)
   const buttonRef = useRef(null)
   const statusDropdownRef = useRef(null)
@@ -75,14 +77,7 @@ const TaskItem = ({ task, onLogout, showCompleteCheckbox = true }) => {
         setShowEditModal(true)
         break
       case "delete":
-        if (window.confirm("Are you sure you want to delete this task?")) {
-          try {
-            await updateTask(task._id, { deleted: true })
-          } catch (err) {
-            console.error(err)
-            if (err.response?.status === 401) onLogout?.()
-          }
-        }
+        setShowDeleteModal(true)
         break
     }
   }
@@ -129,6 +124,16 @@ const TaskItem = ({ task, onLogout, showCompleteCheckbox = true }) => {
       setShowEditModal(false)
     } catch (err) {
       console.error('Error saving task:', err)
+      if (err.response?.status === 401) onLogout?.()
+    }
+  }
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteTask(task._id)
+      setShowDeleteModal(false)
+    } catch (err) {
+      console.error(err)
       if (err.response?.status === 401) onLogout?.()
     }
   }
@@ -305,6 +310,13 @@ const TaskItem = ({ task, onLogout, showCompleteCheckbox = true }) => {
         onClose={() => setShowEditModal(false)}
         taskToEdit={task}
         onSave={handleSave}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+        taskTitle={task.title}
       />
     </>
   )

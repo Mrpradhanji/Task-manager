@@ -7,6 +7,8 @@ import Complete from './pages/Complete';
 import Profile from './components/Profile';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 import LandingPage from './pages/LandingPage';
 import './index.css';
 
@@ -147,6 +149,32 @@ const App = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <SignUp onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/login')} />
           </div>
+          )
+        }
+      />
+
+      <Route
+        path="/forgot-password"
+        element={
+          currentUser ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <ForgotPassword onBackToLogin={() => navigate('/login')} />
+            </div>
+          )
+        }
+      />
+
+      <Route
+        path="/reset-password"
+        element={
+          currentUser ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <ResetPassword />
+            </div>
           )
         }
       />

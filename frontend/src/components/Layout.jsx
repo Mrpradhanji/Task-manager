@@ -82,12 +82,44 @@ const Layout = ({ user, onLogout }) => {
     }
   }, [tasks, onLogout]);
 
-  // Memoized context value to prevent unnecessary re-renders
+  // Add deleteTask function
+  const deleteTask = useCallback(async (taskId) => {
+    // Store the previous state for rollback
+    const previousTasks = tasks;
+    
+    // Optimistically remove the task
+    setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No auth token found");
+
+      const response = await axios.delete(
+        `http://localhost:4000/api/tasks/${taskId}/gp`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (!response.data.success) {
+        // Revert on failure
+        setTasks(previousTasks);
+        throw new Error("Failed to delete task");
+      }
+    } catch (err) {
+      // Revert on error
+      setTasks(previousTasks);
+      console.error("Error deleting task:", err);
+      if (err.response?.status === 401) onLogout();
+      throw err;
+    }
+  }, [tasks, onLogout]);
+
+  // Update context value to include deleteTask
   const contextValue = useMemo(() => ({
     tasks,
     refreshTasks: fetchTasks,
-    updateTask
-  }), [tasks, fetchTasks, updateTask]);
+    updateTask,
+    deleteTask
+  }), [tasks, fetchTasks, updateTask, deleteTask]);
 
   const stats = useMemo(() => {
     const completedTasks = tasks.filter(t => 

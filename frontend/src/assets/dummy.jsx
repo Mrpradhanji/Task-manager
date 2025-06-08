@@ -266,7 +266,6 @@ export const layoutClasses = {
 // Menu options for task actions
 export const MENU_OPTIONS = [
     { action: "edit", label: "Edit Task", icon: <Edit2 size={14} className="text-[#3b82f6]" /> },
-    { action: "status", label: "Change Status", icon: <RefreshCw size={14} className="text-[#3b82f6]" /> },
     { action: "delete", label: "Delete Task", icon: <Trash2 size={14} className="text-red-600" /> },
 ]
 

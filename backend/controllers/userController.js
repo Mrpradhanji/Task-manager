@@ -2,9 +2,20 @@ import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import validator from "validator";
+import crypto from "crypto";
+import { Resend } from 'resend';
+import { OAuth2Client } from "google-auth-library";
+import emailService from "../services/emailService.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here';
 const TOKEN_EXPIRES = "24h";
+const RESET_TOKEN_EXPIRES = "1h";
+
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Initialize Google OAuth client
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const createToken = (userId) =>
     jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: TOKEN_EXPIRES });
@@ -119,5 +130,120 @@ export async function updatePassword(req, res) {
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: "Server error." });
+    }
+}
+
+// FORGOT PASSWORD
+export async function forgotPassword(req, res) {
+    const { email } = req.body;
+    if (!email || !validator.isEmail(email)) {
+        return res.status(400).json({ success: false, message: "Valid email required." });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            // Don't reveal if email exists or not
+            return res.json({ success: true, message: "If your email is registered, you will receive a password reset link." });
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetTokenExpiry = Date.now() + 3600000; // 1 hour
+
+        user.resetToken = resetToken;
+        user.resetTokenExpiry = resetTokenExpiry;
+        await user.save();
+
+        // Send reset email using email service
+        await emailService.sendPasswordResetEmail(user, resetToken);
+
+        res.json({ success: true, message: "If your email is registered, you will receive a password reset link." });
+    } catch (err) {
+        console.error('Password reset error:', err);
+        res.status(500).json({ success: false, message: "Error processing request." });
+    }
+}
+
+// RESET PASSWORD
+export async function resetPassword(req, res) {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword || newPassword.length < 8) {
+        return res.status(400).json({ success: false, message: "Invalid token or password." });
+    }
+
+    try {
+        const user = await User.findOne({
+            resetToken: token,
+            resetTokenExpiry: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: "Invalid or expired reset token." });
+        }
+
+        // Update password and clear reset token
+        user.password = await bcrypt.hash(newPassword, 10);
+        user.resetToken = undefined;
+        user.resetTokenExpiry = undefined;
+        await user.save();
+
+        res.json({ success: true, message: "Password has been reset successfully." });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Error resetting password." });
+    }
+}
+
+// GOOGLE AUTH
+export async function googleAuth(req, res) {
+    const { token } = req.body;
+    if (!token) {
+        return res.status(400).json({ success: false, message: "Google token required." });
+    }
+
+    try {
+        // Verify Google token
+        const ticket = await googleClient.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+
+        const payload = ticket.getPayload();
+        const { email, name, picture } = payload;
+
+        // Find or create user
+        let user = await User.findOne({ email });
+        if (!user) {
+            // Create new user with Google info
+            user = await User.create({
+                email,
+                name,
+                password: crypto.randomBytes(16).toString('hex'), // Random password
+                googleId: payload.sub,
+                profilePicture: picture
+            });
+        } else if (!user.googleId) {
+            // Link existing account with Google
+            user.googleId = payload.sub;
+            user.profilePicture = picture;
+            await user.save();
+        }
+
+        // Create JWT token
+        const jwtToken = createToken(user._id);
+        res.json({
+            success: true,
+            token: jwtToken,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                profilePicture: user.profilePicture
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(401).json({ success: false, message: "Invalid Google token." });
     }
 }
