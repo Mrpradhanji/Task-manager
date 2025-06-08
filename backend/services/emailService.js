@@ -17,7 +17,7 @@ class EmailService {
             await this.resend.emails.send({
                 from: this.fromEmail,
                 to: user.email,
-                subject: 'Reset Your TaskFlow Password',
+                subject: 'Reset Your RTASK Password',
                 html: this.getPasswordResetTemplate(user.name, resetUrl)
             });
             return true;
@@ -36,7 +36,7 @@ class EmailService {
                     Hello ${userName},
                 </p>
                 <p style="color: #666; font-size: 16px; line-height: 1.5;">
-                    We received a request to reset your password for your TaskFlow account. Click the button below to reset it:
+                    We received a request to reset your password for your RTASK account. Click the button below to reset it:
                 </p>
                 <div style="text-align: center; margin: 30px 0;">
                     <a href="${resetUrl}" 

@@ -28,9 +28,6 @@ const API_URL = "http://localhost:4000"
 
 export default function Profile({ setCurrentUser, onLogout }) {
   const [profile, setProfile] = useState({ name: "", email: "", avatar: "" })
-  const [settings, setSettings] = useState({
-    notifications: true
-  })
   const [isLoading, setIsLoading] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef(null)
@@ -191,15 +188,6 @@ export default function Profile({ setCurrentUser, onLogout }) {
     }
   }
 
-  const handleSettingChange = (setting, value) => {
-    console.log('Updating setting:', setting, 'to:', value)
-    setSettings(prev => ({
-      ...prev,
-      [setting]: value
-    }))
-    toast.success("Setting updated")
-  }
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -306,32 +294,6 @@ export default function Profile({ setCurrentUser, onLogout }) {
               </button>
               </div>
             </form>
-          </div>
-
-          {/* Preferences Section */}
-          <div className={SECTION_WRAPPER}>
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">Preferences</h2>
-            <div className="space-y-4">
-              {/* Notifications */}
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Bell className="h-5 w-5 text-indigo-500" />
-                  <div>
-                    <h3 className="font-medium text-gray-800">Email Notifications</h3>
-                    <p className="text-sm text-gray-500">Receive email updates about your tasks</p>
-                  </div>
-            </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={settings.notifications}
-                    onChange={(e) => handleSettingChange('notifications', e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                </label>
-              </div>
-            </div>
           </div>
 
           {/* Security Section */}

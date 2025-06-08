@@ -64,7 +64,7 @@ const LandingPage = () => {
                   <ClipboardList className="w-6 h-6 text-[#3b82f6] group-hover:scale-110 transition-transform" />
                 </div>
                 <span className="text-2xl font-extrabold text-[#3b82f6]">
-                  TaskFlow
+                  RTASK
                 </span>
               </div>
             </div>
@@ -113,44 +113,30 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-[#f8fafc]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#1e293b] mb-6">
-              Organize Tasks,{" "}
-              <span className="text-[#3b82f6]">
-                Boost Productivity
-              </span>
-            </h1>
-            <p className="text-lg sm:text-xl text-[#64748b] max-w-3xl mx-auto mb-8">
-              TaskFlow helps you manage your tasks efficiently, collaborate with your team, and achieve your goals faster than ever before.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => navigate("/signup")}
-                className="px-8 py-3 rounded-lg bg-[#3b82f6] text-white hover:bg-[#2563eb] transition-all flex items-center justify-center gap-2 group shadow-sm"
-              >
-                Get Started Free
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button 
-                onClick={() => navigate("/login")}
-                className="px-8 py-3 rounded-lg border border-[#3b82f6] text-[#3b82f6] hover:bg-[#3b82f6]/5 transition-colors"
-              >
-                Sign In
-              </button>
-            </div>
-          </div>
-
-          {/* Hero Image */}
-          <div className="mt-16 relative">
-            <div className="absolute inset-0 bg-[#3b82f6]/5 rounded-3xl blur-3xl" />
-            <div className="relative bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6">
-              <img 
-                src="/dashboard-preview.png" 
-                alt="TaskFlow Dashboard Preview" 
-                className="w-full h-auto rounded-xl"
-              />
+      <section className="pt-40 pb-20 bg-[#0A0A0A]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center">
+              <h1 className="text-4xl md:text-5xl font-bold text-[#00FFFF] mb-4">
+                Welcome to RTASK
+              </h1>
+              <p className="text-xl text-[#00FFFF] mb-8">
+                RTASK helps you manage your tasks efficiently, collaborate with your team, and achieve your goals faster than ever before.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="px-8 py-3 bg-[#00FFFF] text-[#0A0A0A] rounded-lg font-medium hover:bg-[#00FFFF]/90 transition-colors"
+                >
+                  Get Started
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-8 py-3 border border-[#00FFFF] text-[#00FFFF] rounded-lg font-medium hover:bg-[#00FFFF]/10 transition-colors"
+                >
+                  Sign In
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -195,7 +181,7 @@ const LandingPage = () => {
             <h2 className="text-3xl sm:text-4xl font-bold text-[#1e293b] mb-4">
               Why Choose{" "}
               <span className="text-[#3b82f6]">
-                TaskFlow?
+                RTASK?
               </span>
             </h2>
             <p className="text-lg text-[#64748b] max-w-2xl mx-auto">
@@ -236,17 +222,12 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 py-12">
+      <footer className="bg-[#0A0A0A] border-t border-[#00FFFF]/20 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#3b82f6]/10 border border-[#3b82f6]/20">
-                <ClipboardList className="w-6 h-6 text-[#3b82f6]" />
-              </div>
-              <span className="text-2xl font-extrabold text-[#3b82f6]">TaskFlow</span>
-            </div>
-            <p className="text-[#64748b]">
-              © {new Date().getFullYear()} TaskFlow. All rights reserved.
+            <span className="text-2xl font-extrabold text-[#3b82f6]">RTASK</span>
+            <p className="mt-4 text-gray-400">
+              © {new Date().getFullYear()} RTASK. All rights reserved.
             </p>
           </div>
         </div>

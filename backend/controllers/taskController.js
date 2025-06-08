@@ -95,7 +95,7 @@ const checkTitleUnique = async (req, res) => {
 
     // Build query to check for duplicate title
     const query = {
-      userId,
+      owner: userId,
       title: { $regex: new RegExp(`^${title}$`, 'i') } // Case-insensitive exact match
     };
 

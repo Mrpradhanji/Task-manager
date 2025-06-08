@@ -76,7 +76,7 @@ const SignUp = ({ onSubmit, onSwitchMode }) => {
     <div className="bg-[#0A0A0A] p-8 rounded-lg shadow-lg w-full max-w-md border border-[#00FFFF]/20">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-white mb-2">Create Account</h2>
-        <p className="text-gray-400">Join TaskFlow to manage your tasks</p>
+        <p className="text-gray-400">Join RTASK to manage your tasks</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

@@ -112,7 +112,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     <div className="bg-[#0A0A0A] p-8 rounded-lg shadow-lg w-full max-w-md border border-[#00FFFF]/20">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
-        <p className="text-gray-400">Sign in to continue to TaskFlow</p>
+        <p className="text-gray-400">Sign in to continue to RTASK</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

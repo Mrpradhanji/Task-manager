@@ -29,12 +29,18 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
 
   // Check if title is unique
   const checkTitleUnique = async (title) => {
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      setTitleError(null);
+      return;
+    }
     
     try {
       setIsCheckingTitle(true);
       const token = localStorage.getItem('token');
-      if (!token) throw new Error('No auth token found');
+      if (!token) {
+        setTitleError(null);
+        return;
+      }
 
       const response = await fetch(`${API_BASE}/check-title`, {
         method: 'POST',
@@ -43,7 +49,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ 
-          title,
+          title: title.trim(),
           taskId: taskData.id // Include taskId if editing
         })
       });
@@ -51,7 +57,9 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to check title');
+        // Don't show error for network issues, just clear any existing error
+        setTitleError(null);
+        return;
       }
 
       if (!data.isUnique) {
@@ -60,8 +68,8 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
         setTitleError(null);
       }
     } catch (err) {
-      console.error('Error checking title:', err);
-      setTitleError('Error checking title availability');
+      // Don't show error for network issues, just clear any existing error
+      setTitleError(null);
     } finally {
       setIsCheckingTitle(false);
     }
@@ -69,7 +77,9 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
 
   // Debounced title check
   const debouncedCheckTitle = useCallback(
-    debounce((title) => checkTitleUnique(title), 500),
+    debounce((title) => {
+      checkTitleUnique(title);
+    }, 500),
     [taskData.id]
   );
 
@@ -174,6 +184,12 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
     return isDuplicate;
   }, [existingTasks, taskData.id]);
 
+  const priorityOptions = [
+    { value: 'Low', label: 'Low' },
+    { value: 'Medium', label: 'Medium' },
+    { value: 'High', label: 'High' }
+  ];
+
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     
@@ -202,7 +218,11 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
       const resp = await fetch(url, {
         method: isEdit ? 'PUT' : 'POST',
         headers: getHeaders(),
-        body: JSON.stringify(taskData),
+        body: JSON.stringify({
+          ...taskData,
+          title: taskData.title.trim(),
+          priority: taskData.priority // Keep the capitalized value
+        }),
       });
 
       if (!resp.ok) {
@@ -324,8 +344,8 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/20 text-[#1e293b]"
               >
-                {Object.entries(PRIORITY_TAGS).map(([key, { label }]) => (
-                  <option key={key} value={key.toLowerCase()}>
+                {priorityOptions.map(({ value, label }) => (
+                  <option key={value} value={value}>
                     {label}
                   </option>
                 ))}

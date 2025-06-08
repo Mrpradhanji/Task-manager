@@ -34,7 +34,7 @@
 //    • On your cluster, click the blue "Connect" button.
 //    • Choose "Connect your application."
 //    • Copy the URI, e.g.:
-//      mongodb+srv://<username>:<password>@cluster0.t5l2pir.mongodb.net/Taskflow?retryWrites=true&w=majority
+//      mongodb+srv://<username>:<password>@cluster0.t5l2pir.mongodb.net/RTASK?retryWrites=true&w=majority
 //    • Replace <username> and <password> with the ones you created.
 //
 // 7. STORE CREDENTIALS IN ENVIRONMENT VARIABLES
@@ -42,7 +42,7 @@
 //        MONGO_USER=myAppUser
 //        MONGO_PASS=YourSecurePassword123
 //        MONGO_CLUSTER=cluster0.t5l2pir.mongodb.net
-//        MONGO_DB=Taskflow
+//        MONGO_DB=RTASK
 //
 // 8. UPDATE YOUR CODE TO USE DOTENV
 //    • Install dotenv: `npm install dotenv`

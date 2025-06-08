@@ -133,11 +133,29 @@ const Layout = ({ user, onLogout }) => {
     const completionPercentage = totalCount ? 
       Math.round((completedTasks / totalCount) * 100) : 0
 
+    // Calculate trends based on task data
+    const calculateTrend = (current, previous) => {
+      if (!previous) return 0;
+      const change = ((current - previous) / previous) * 100;
+      return Math.round(change);
+    };
+
+    // For now, we'll use the current values as both current and previous
+    // In a real app, you would store historical data to calculate actual trends
+    const totalTrend = totalCount > 0 ? 0 : 0;
+    const completedTrend = completedTasks > 0 ? 0 : 0;
+    const pendingTrend = pendingCount > 0 ? 0 : 0;
+    const completionTrend = completionPercentage > 0 ? 0 : 0;
+
     return {
       totalCount,
       completedTasks,
       pendingCount,
-      completionPercentage
+      completionPercentage,
+      totalTrend,
+      completedTrend,
+      pendingTrend,
+      completionTrend
     }
   }, [tasks])
 
@@ -258,28 +276,28 @@ const Layout = ({ user, onLogout }) => {
                   value={stats.totalCount} 
                   icon={<Circle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                   color="blue"
-                  trend={5} // Example trend - you can calculate this based on historical data
+                  trend={stats.totalTrend}
                 />
                 <StatCard 
                   title="Completed" 
                   value={stats.completedTasks} 
                   icon={<CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                   color="green"
-                  trend={8}
+                  trend={stats.completedTrend}
                 />
                 <StatCard 
                   title="Pending" 
                   value={stats.pendingCount} 
                   icon={<AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                   color="blue"
-                  trend={-3}
+                  trend={stats.pendingTrend}
                 />
                 <StatCard
                   title="Completion Rate"
                   value={`${stats.completionPercentage}%`}
                   icon={<Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                   color="blue"
-                  trend={stats.completionPercentage > 50 ? 12 : -5}
+                  trend={stats.completionTrend}
                 />
               </div>
 
