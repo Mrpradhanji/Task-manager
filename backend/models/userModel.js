@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         sparse: true
     },
-    profilePicture: {
+    avatar: {
         type: String
     },
     resetToken: String,

@@ -1,26 +1,35 @@
 import { useState, useRef, useEffect } from "react"
-import { Settings, ChevronDown, LogOut, ClipboardList } from "lucide-react"
+import { Settings, ChevronDown, LogOut, ClipboardList, Moon, Sun } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
-const Navbar = ({ user = {}, onLogout }) => {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const navigate = useNavigate()
-  const menuRef = useRef(null)
+export default function Navbar({ onLogout, currentUser }) {
+  const [isMenuOpen, setMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
+  const menuRef = useRef(null)
+  const navigate = useNavigate()
 
   const handleMenuToggle = () => setMenuOpen((prev) => !prev)
+  const handleUserMenuToggle = () => setIsUserMenuOpen((prev) => !prev)
+
   const handleLogout = () => {
-    setMenuOpen(false)
+    setIsUserMenuOpen(false)
     onLogout()
+  }
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode)
+    // Dark mode functionality will be implemented later
   }
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuOpen(false)
+        setIsUserMenuOpen(false)
       }
     }
+
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
@@ -29,46 +38,68 @@ const Navbar = ({ user = {}, onLogout }) => {
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
       <div className="flex items-center justify-between px-4 py-3 md:px-6 max-w-7xl mx-auto">
         {/* Left - Logo + Brand */}
-        <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate("/")}>
-          <div className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-[#3b82f6]/10 border border-[#3b82f6]/20 shadow-sm group hover:bg-[#3b82f6]/20 transition-all">
-            <ClipboardList className="w-6 h-6 text-[#3b82f6] group-hover:scale-110 transition-transform" />
-          </div>
-          <span className="text-2xl font-extrabold text-[#3b82f6] tracking-wide">
-            TaskFlow
-          </span>
+        <div className="flex items-center gap-2">
+          <ClipboardList className="w-6 h-6 text-indigo-600" />
+          <span className="text-lg font-semibold text-gray-900">Task Manager</span>
         </div>
 
         {/* Right - User Controls */}
         <div className="flex items-center gap-4">
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            aria-label="Toggle dark mode"
+          >
+            {isDarkMode ? (
+              <Sun className="h-5 w-5 text-indigo-500" />
+            ) : (
+              <Moon className="h-5 w-5 text-indigo-500" />
+            )}
+          </button>
+
           {/* User Menu */}
-          <div className="relative">
-            <button 
-              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="flex items-center gap-2 p-2 rounded-lg hover:bg-[#3b82f6]/5 transition-colors"
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={handleUserMenuToggle}
+              className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <div className="w-8 h-8 rounded-full bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center text-[#3b82f6]">
-                {user?.name?.[0]?.toUpperCase() || 'U'}
+              <div className="h-8 w-8 rounded-full overflow-hidden bg-indigo-100">
+                {currentUser?.avatar ? (
+                  <img
+                    src={currentUser.avatar}
+                    alt={currentUser.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center text-indigo-600 font-medium">
+                    {currentUser?.name?.[0]?.toUpperCase()}
+                  </div>
+                )}
               </div>
-              <span className="hidden md:block text-sm font-medium text-[#1e293b]">{user?.name || 'User'}</span>
-              <ChevronDown className={`w-4 h-4 text-[#64748b] transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+              <span className="text-sm font-medium text-gray-700">{currentUser?.name}</span>
+              <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Dropdown Menu */}
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white border border-gray-100 shadow-lg py-1">
-                <button 
-                  onClick={() => navigate("/dashboard/settings")}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-[#1e293b] hover:bg-[#3b82f6]/5 transition-colors"
+              <div className="absolute right-0 mt-2 w-48 rounded-lg bg-white shadow-lg border border-gray-100 py-1">
+                <button
+                  onClick={() => {
+                    setIsUserMenuOpen(false)
+                    navigate('/profile')
+                  }}
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 >
-                  <Settings className="w-4 h-4 text-[#64748b]" />
+                  <Settings className="w-4 h-4" />
                   Settings
                 </button>
-                <button 
+                <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-[#ef4444] hover:bg-[#ef4444]/5 transition-colors"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
                 >
                   <LogOut className="w-4 h-4" />
-                  Sign Out
+                  Logout
                 </button>
               </div>
             )}
@@ -78,5 +109,3 @@ const Navbar = ({ user = {}, onLogout }) => {
     </header>
   )
 }
-
-export default Navbar

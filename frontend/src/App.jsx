@@ -186,8 +186,13 @@ const App = () => {
         <Route index element={<Dashboard />} />
         <Route path="pending" element={<Pending />} />
         <Route path="complete" element={<Complete />} />
-        <Route path="settings" element={<Profile user={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout} />} />
-        <Route path="profile" element={<Profile user={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout} />} />
+      </Route>
+
+      <Route
+        path="/profile"
+        element={<ProtectedLayout />}
+      >
+        <Route index element={<Profile setCurrentUser={setCurrentUser} onLogout={handleLogout} />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

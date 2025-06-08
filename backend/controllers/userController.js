@@ -6,6 +6,9 @@ import crypto from "crypto";
 import { Resend } from 'resend';
 import { OAuth2Client } from "google-auth-library";
 import emailService from "../services/emailService.js";
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_here';
 const TOKEN_EXPIRES = "24h";
@@ -16,6 +19,42 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Initialize Google OAuth client
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Configure multer for file upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(process.cwd(), 'uploads', 'avatars');
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    console.log('Upload directory:', uploadDir);
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // Create a unique filename
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname).toLowerCase();
+    const filename = `avatar-${uniqueSuffix}${ext}`;
+    console.log('Generated filename:', filename);
+    cb(null, filename);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: function (req, file, cb) {
+    // Accept images only
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.mimetype)) {
+      return cb(new Error('Only image files (JPEG, PNG, GIF) are allowed!'), false);
+    }
+    cb(null, true);
+  }
+}).single('avatar');
 
 const createToken = (userId) =>
     jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: TOKEN_EXPIRES });
@@ -75,7 +114,7 @@ export async function loginUser(req, res) {
 // GET CURRENT USER
 export async function getCurrentUser(req, res) {
     try {
-        const user = await User.findById(req.user.id).select("name email");
+        const user = await User.findById(req.user.id).select("name email avatar");
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found." });
         }
@@ -252,4 +291,41 @@ export async function googleAuth(req, res) {
         console.error(err);
         res.status(401).json({ success: false, message: "Invalid Google token." });
     }
+}
+
+// UPLOAD AVATAR
+export async function uploadAvatar(req, res) {
+    upload(req, res, async function(err) {
+        if (err) {
+            console.error('Multer error:', err);
+            return res.status(400).json({ success: false, message: err.message });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded' });
+        }
+
+        try {
+            const avatarPath = `/uploads/avatars/${req.file.filename}`;
+            const user = await User.findByIdAndUpdate(
+                req.user.id,
+                { avatar: avatarPath },
+                { new: true }
+            );
+
+            if (!user) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+
+            res.json({
+                success: true,
+                message: 'Avatar uploaded successfully',
+                avatar: avatarPath,
+                fullAvatarUrl: `${process.env.FRONTEND_URL || 'http://localhost:4000'}${avatarPath}`
+            });
+        } catch (error) {
+            console.error('Error updating avatar:', error);
+            res.status(500).json({ success: false, message: 'Error updating avatar' });
+        }
+    });
 }

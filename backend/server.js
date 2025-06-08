@@ -2,6 +2,12 @@ import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
 import { connectDB } from './config/db.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get the directory name
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Detailed environment variable check
 console.log('Environment Variables Check:', {
@@ -11,9 +17,7 @@ console.log('Environment Variables Check:', {
     MONGO_CLUSTER: process.env.MONGO_CLUSTER ? 'exists' : 'missing',
     MONGO_DB: process.env.MONGO_DB ? 'exists' : 'missing',
     JWT_SECRET: process.env.JWT_SECRET ? 'exists' : 'missing',
-    // Check if .env is being loaded
     NODE_ENV: process.env.NODE_ENV,
-    // Check the actual MongoDB URI being constructed
     MONGODB_URI: process.env.MONGO_USER && process.env.MONGO_PASS && process.env.MONGO_CLUSTER && process.env.MONGO_DB 
         ? `mongodb+srv://${process.env.MONGO_USER}:****@${process.env.MONGO_CLUSTER}/${process.env.MONGO_DB}`
         : 'incomplete'
@@ -23,12 +27,16 @@ import userRouter from './routes/userRoute.js';
 import taskRouter from './routes/taskRoute.js';
 
 const app = express();
-const port = process.env.PORT || 4000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from uploads directory
+const uploadsPath = path.join(__dirname, 'uploads');
+console.log('Serving static files from:', uploadsPath);
+app.use('/uploads', express.static(uploadsPath));
 
 // Database Connection
 connectDB();
@@ -41,6 +49,14 @@ app.get('/', (req, res) => {
     res.send('API Working');
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({ success: false, message: "Something went wrong!" });
+});
+
+const port = process.env.PORT || 4000;
 app.listen(port, () => {
     console.log(`Server Started on http://localhost:${port}`);
+    console.log('Uploads directory:', uploadsPath);
 });

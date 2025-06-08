@@ -99,6 +99,7 @@ export const menuItems = [
     { text: "Dashboard", path: "/dashboard", icon: <Home className="w-5 h-5" /> },
     { text: "Pending Tasks", path: "/dashboard/pending", icon: <ListChecks className="w-5 h-5" /> },
     { text: "Completed Tasks", path: "/dashboard/complete", icon: <CheckCircle2 className="w-5 h-5" /> },
+    { text: "Settings", path: "/profile", icon: <User className="w-5 h-5" /> },
 ]
 
 export const SIDEBAR_CLASSES = {
