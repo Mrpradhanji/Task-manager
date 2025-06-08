@@ -44,9 +44,14 @@ const App = () => {
 
         const data = await response.json();
         if (data.success && data.user) {
+          const avatarUrl = data.user.avatar 
+            ? `http://localhost:4000${data.user.avatar}`
+            : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=random`;
+
           setCurrentUser(prev => ({
             ...prev,
             ...data.user,
+            avatar: avatarUrl,
             token // Keep the existing token
           }));
         } else {
@@ -89,7 +94,7 @@ const App = () => {
     const user = {
       email: data.email,
       name: data.name || 'User',
-      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'User')}&background=random`,
+      avatar: data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'User')}&background=random`,
       token: data.token,
       id: data.userId
     };

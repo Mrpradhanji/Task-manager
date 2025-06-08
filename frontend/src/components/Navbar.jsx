@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { Settings, ChevronDown, LogOut, ClipboardList, Moon, Sun } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
-export default function Navbar({ onLogout, currentUser }) {
+export default function Navbar({ onLogout, user }) {
   const [isMenuOpen, setMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -65,19 +65,19 @@ export default function Navbar({ onLogout, currentUser }) {
               className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <div className="h-8 w-8 rounded-full overflow-hidden bg-indigo-100">
-                {currentUser?.avatar ? (
+                {user?.avatar ? (
                   <img
-                    src={currentUser.avatar}
-                    alt={currentUser.name}
+                    src={user.avatar}
+                    alt={user.name}
                     className="h-full w-full object-cover"
                   />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center text-indigo-600 font-medium">
-                    {currentUser?.name?.[0]?.toUpperCase()}
+                    {user?.name?.[0]?.toUpperCase()}
                   </div>
                 )}
               </div>
-              <span className="text-sm font-medium text-gray-700">{currentUser?.name}</span>
+              <span className="text-sm font-medium text-gray-700">{user?.name}</span>
               <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
