@@ -73,7 +73,6 @@ const LandingPage = () => {
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-[#1e293b] hover:text-[#3b82f6] transition-colors">Features</a>
               <a href="#benefits" className="text-[#1e293b] hover:text-[#3b82f6] transition-colors">Benefits</a>
-              <a href="#pricing" className="text-[#1e293b] hover:text-[#3b82f6] transition-colors">Pricing</a>
               <button 
                 onClick={() => navigate("/login")}
                 className="px-4 py-2 rounded-lg bg-[#3b82f6] text-white hover:bg-[#2563eb] transition-all shadow-sm"
@@ -102,7 +101,6 @@ const LandingPage = () => {
             <div className="px-4 py-3 space-y-3">
               <a href="#features" className="block text-[#e9ecef] hover:text-[#4dabf7] transition-colors">Features</a>
               <a href="#benefits" className="block text-[#e9ecef] hover:text-[#4dabf7] transition-colors">Benefits</a>
-              <a href="#pricing" className="block text-[#e9ecef] hover:text-[#4dabf7] transition-colors">Pricing</a>
               <button 
                 onClick={() => navigate("/login")}
                 className="w-full px-4 py-2 rounded-lg bg-[#4dabf7]/10 text-[#4dabf7] hover:bg-[#4dabf7]/20 transition-all border border-[#4dabf7]/20"
@@ -201,83 +199,36 @@ const LandingPage = () => {
               </span>
             </h2>
             <p className="text-lg text-[#64748b] max-w-2xl mx-auto">
-              Experience the difference with our powerful task management platform.
+              Experience the difference with our powerful task management solution.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center text-[#3b82f6] shrink-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="p-6 rounded-xl bg-white border border-gray-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center text-[#3b82f6]">
                   <Sparkles className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#1e293b] mb-2">Intuitive Interface</h3>
-                  <p className="text-[#64748b]">Designed for simplicity and ease of use, making task management a breeze.</p>
+                  <h3 className="text-xl font-semibold text-[#1e293b] mb-2">Boost Productivity</h3>
+                  <p className="text-[#64748b]">
+                    Streamline your workflow and get more done with our intuitive task management system.
+                  </p>
                 </div>
               </div>
+            </div>
 
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center text-[#3b82f6] shrink-0">
+            <div className="p-6 rounded-xl bg-white border border-gray-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-lg bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center text-[#3b82f6]">
                   <Bell className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#1e293b] mb-2">Smart Notifications</h3>
-                  <p className="text-[#64748b]">Stay updated with intelligent notifications and reminders.</p>
+                  <h3 className="text-xl font-semibold text-[#1e293b] mb-2">Stay Updated</h3>
+                  <p className="text-[#64748b]">
+                    Never miss a deadline with real-time notifications and progress tracking.
+                  </p>
                 </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center text-[#3b82f6] shrink-0">
-                  <Shield className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-[#1e293b] mb-2">Enterprise Security</h3>
-                  <p className="text-[#64748b]">Your data is protected with industry-leading security measures.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 bg-[#3b82f6]/5 rounded-3xl blur-3xl" />
-              <div className="relative bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
-                <img 
-                  src="/features-preview.png" 
-                  alt="TaskFlow Features Preview" 
-                  className="w-full h-auto rounded-xl"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-100">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#3b82f6]/5 rounded-3xl blur-3xl" />
-            <div className="relative bg-[#f0f9ff] rounded-2xl p-8 sm:p-12 border border-[#3b82f6]/10">
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#1e293b] mb-6">
-                Ready to Boost Your Productivity?
-              </h2>
-              <p className="text-lg text-[#64748b] mb-8">
-                Join thousands of teams who trust TaskFlow for their task management needs.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button 
-                  onClick={() => navigate("/signup")}
-                  className="px-8 py-3 rounded-lg bg-[#3b82f6] text-white hover:bg-[#2563eb] transition-all flex items-center justify-center gap-2 group shadow-sm"
-                >
-                  Start Free Trial
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <button 
-                  onClick={() => navigate("/login")}
-                  className="px-8 py-3 rounded-lg border border-[#3b82f6] text-[#3b82f6] hover:bg-[#3b82f6]/5 transition-colors"
-                >
-                  Sign In
-                </button>
               </div>
             </div>
           </div>
@@ -285,47 +236,16 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="relative w-8 h-8 flex items-center justify-center rounded-lg bg-[#3b82f6]/10 border border-[#3b82f6]/20 group hover:bg-[#3b82f6]/20 transition-all">
-                  <ClipboardList className="w-5 h-5 text-[#3b82f6] group-hover:scale-110 transition-transform" />
-                </div>
-                <span className="text-xl font-bold text-[#3b82f6]">TaskFlow</span>
+      <footer className="bg-white border-t border-gray-100 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#3b82f6]/10 border border-[#3b82f6]/20">
+                <ClipboardList className="w-6 h-6 text-[#3b82f6]" />
               </div>
-              <p className="text-sm text-[#64748b]">
-                The modern task management platform for teams that want to get more done.
-              </p>
+              <span className="text-2xl font-extrabold text-[#3b82f6]">TaskFlow</span>
             </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[#1e293b] mb-4">Product</h3>
-              <ul className="space-y-3">
-                <li><a href="#features" className="text-sm text-[#64748b] hover:text-[#3b82f6] transition-colors">Features</a></li>
-                <li><a href="#benefits" className="text-sm text-[#64748b] hover:text-[#3b82f6] transition-colors">Benefits</a></li>
-                <li><a href="#pricing" className="text-sm text-[#64748b] hover:text-[#3b82f6] transition-colors">Pricing</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[#1e293b] mb-4">Company</h3>
-              <ul className="space-y-3">
-                <li><a href="#" className="text-sm text-[#64748b] hover:text-[#3b82f6] transition-colors">About</a></li>
-                <li><a href="#" className="text-sm text-[#64748b] hover:text-[#3b82f6] transition-colors">Blog</a></li>
-                <li><a href="#" className="text-sm text-[#64748b] hover:text-[#3b82f6] transition-colors">Careers</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[#1e293b] mb-4">Legal</h3>
-              <ul className="space-y-3">
-                <li><a href="#" className="text-sm text-[#64748b] hover:text-[#3b82f6] transition-colors">Privacy</a></li>
-                <li><a href="#" className="text-sm text-[#64748b] hover:text-[#3b82f6] transition-colors">Terms</a></li>
-                <li><a href="#" className="text-sm text-[#64748b] hover:text-[#3b82f6] transition-colors">Security</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-12 pt-8 border-t border-gray-100 text-center">
-            <p className="text-sm text-[#64748b]">
+            <p className="text-[#64748b]">
               © {new Date().getFullYear()} TaskFlow. All rights reserved.
             </p>
           </div>
@@ -336,3 +256,6 @@ const LandingPage = () => {
 }
 
 export default LandingPage 
+
+
+

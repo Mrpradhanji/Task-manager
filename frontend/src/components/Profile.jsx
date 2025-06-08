@@ -223,7 +223,7 @@ export default function Profile({ setCurrentUser, onLogout }) {
           >
             <ChevronLeft className="h-5 w-5" />
             Back
-          </button>
+        </button>
         </div>
 
         <div className="space-y-6">
@@ -269,15 +269,15 @@ export default function Profile({ setCurrentUser, onLogout }) {
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                   Name
                 </label>
-                <input
+                  <input
                   type="text"
                   id="name"
                   value={profile.name}
                   onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
                   className={INPUT_WRAPPER}
                   placeholder="Your name"
-                />
-              </div>
+                  />
+                </div>
 
               {/* Email Field (Read-only) */}
               <div>
@@ -303,7 +303,7 @@ export default function Profile({ setCurrentUser, onLogout }) {
                 >
                   <Save className="w-4 h-4" />
                   Save Changes
-                </button>
+              </button>
               </div>
             </form>
           </div>
@@ -320,7 +320,7 @@ export default function Profile({ setCurrentUser, onLogout }) {
                     <h3 className="font-medium text-gray-800">Email Notifications</h3>
                     <p className="text-sm text-gray-500">Receive email updates about your tasks</p>
                   </div>
-                </div>
+            </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -359,47 +359,53 @@ export default function Profile({ setCurrentUser, onLogout }) {
                   }
 
                   try {
-                    const response = await fetch('http://localhost:4000/api/user/update-password', {
-                      method: 'PUT',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                      },
-                      body: JSON.stringify({
-                        currentPassword,
-                        newPassword
-                      })
-                    });
-
-                    let data;
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                      data = await response.json();
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                      navigate('/login');
+                      return;
                     }
 
-                    if (response.ok) {
+                    const { data } = await axios.put(
+                      `${API_URL}/api/user/password`,
+                      {
+                        currentPassword,
+                        newPassword
+                      },
+                      {
+                        headers: {
+                          Authorization: `Bearer ${token}`
+                        }
+                      }
+                    );
+
+                    if (data.success) {
                       setMessage({ type: 'success', text: 'Password updated successfully' });
                       e.target.reset();
                       setShowCurrentPassword(false);
                       setShowNewPassword(false);
                       setShowConfirmPassword(false);
-                    } else {
-                      if (response.status === 401) {
-                        throw new Error('Current password is incorrect');
-                      } else if (response.status === 400) {
-                        throw new Error(data?.message || 'Invalid password format');
-                      } else if (response.status === 500) {
-                        throw new Error('Server error. Please try again later.');
-                      } else {
-                        throw new Error(data?.message || 'Failed to update password');
-                      }
                     }
                   } catch (error) {
                     console.error('Password update error:', error);
-                    setMessage({ 
-                      type: 'error', 
-                      text: error.message || 'An unexpected error occurred. Please try again.'
-                    });
+                    let errorMessage = 'An unexpected error occurred. Please try again.';
+                    
+                    if (error.response) {
+                      switch (error.response.status) {
+                        case 401:
+                          errorMessage = 'Current password is incorrect';
+                          break;
+                        case 400:
+                          errorMessage = error.response.data.message || 'Invalid password format';
+                          break;
+                        case 500:
+                          errorMessage = 'Server error. Please try again later.';
+                          break;
+                        default:
+                          errorMessage = error.response.data.message || 'Failed to update password';
+                      }
+                    }
+                    
+                    setMessage({ type: 'error', text: errorMessage });
                   }
                 }} className="space-y-4">
                   {message && (
@@ -497,7 +503,7 @@ export default function Profile({ setCurrentUser, onLogout }) {
                   >
                     <Shield className="w-4 h-4 mr-2" />
                     Update Password
-                  </button>
+              </button>
                 </form>
               </div>
             </div>
@@ -511,9 +517,9 @@ export default function Profile({ setCurrentUser, onLogout }) {
               className={DANGER_BTN}
             >
               <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </button>
-          </div>
+                  Logout
+                </button>
+              </div>
         </div>
       </div>
     </div>
