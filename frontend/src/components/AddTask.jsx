@@ -237,7 +237,8 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
       const saved = await resp.json();
       
       if (saved.success) {
-        onSave?.(saved.data || saved);
+        // Pass the updated task data to onSave
+        onSave?.(saved.task);
         onClose();
       } else {
         throw new Error(saved.message || 'Failed to save task');

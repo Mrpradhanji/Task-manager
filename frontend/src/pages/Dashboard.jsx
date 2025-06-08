@@ -12,7 +12,14 @@ const Dashboard = () => {
   const [toast, setToast] = useState(null)
 
   const handleTaskUpdate = (updatedTask) => {
-    refreshTasks()
+    // Update the task in the local state
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task._id === updatedTask._id ? updatedTask : task
+      )
+    )
+    // Show success toast
+    showToast('Task updated successfully!')
   }
 
   const showToast = (message, type = 'success') => {

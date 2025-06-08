@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Filter, SortDesc, SortAsc, Award, Plus, ListChecks, Clock } from 'lucide-react';
 import TaskItem from '../components/TaskItem';
@@ -17,10 +17,11 @@ const PendingTasks = () => {
   const [sortBy, setSortBy] = React.useState('newest');
   const [selectedTask, setSelectedTask] = React.useState(null);
   const [showModal, setShowModal] = React.useState(false);
+  const [localTasks, setLocalTasks] = React.useState(tasks);
 
   // Memoize the sorted tasks to prevent unnecessary re-sorting
   const sortedPendingTasks = useMemo(() => {
-    return tasks
+    return localTasks
       .filter(task => ![true, 1, "yes"].includes(
         typeof task.completed === 'string' ? task.completed.toLowerCase() : task.completed
       ))
@@ -38,10 +39,18 @@ const PendingTasks = () => {
             return 0;
         }
       });
-  }, [tasks, sortBy]);
+  }, [localTasks, sortBy]);
 
   // Memoize the task count
   const taskCount = useMemo(() => sortedPendingTasks.length, [sortedPendingTasks]);
+
+  const handleTaskUpdate = useCallback((updatedTask) => {
+    setLocalTasks(prevTasks => 
+      prevTasks.map(task => 
+        task._id === updatedTask._id ? updatedTask : task
+      )
+    )
+  }, [])
 
   // Memoize the task list
   const taskList = useMemo(() => (
@@ -50,9 +59,10 @@ const PendingTasks = () => {
         key={task._id}
         task={task}
         onEdit={setSelectedTask}
+        onTaskUpdate={handleTaskUpdate}
       />
     ))
-  ), [sortedPendingTasks]);
+  ), [sortedPendingTasks, handleTaskUpdate]);
 
   const handleCloseModal = React.useCallback(() => {
     setShowModal(false);

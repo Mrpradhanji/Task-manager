@@ -46,7 +46,7 @@ const Layout = ({ user, onLogout }) => {
     // Store the previous state for rollback
     const previousTasks = tasks;
     
-    // Optimistically update the tasks
+    // Optimistically update the task
     setTasks(prevTasks => 
       prevTasks.map(task => 
         task._id === taskId ? { ...task, ...updates } : task
@@ -70,6 +70,7 @@ const Layout = ({ user, onLogout }) => {
             task._id === taskId ? response.data.task : task
           )
         );
+        return response; // Return the response for the caller to use
       } else {
         // Revert on failure
         setTasks(previousTasks);
@@ -162,8 +163,10 @@ const Layout = ({ user, onLogout }) => {
   const contextValue = useMemo(() => ({
     tasks,
     refreshTasks: fetchTasks,
+    updateTask,
+    deleteTask,
     user
-  }), [tasks, fetchTasks, user]);
+  }), [tasks, fetchTasks, updateTask, deleteTask, user]);
 
   const StatCard = ({ title, value, icon, color = "blue", trend = null }) => (
     <div className="p-3 rounded-xl bg-white border border-gray-100 hover:border-[#3b82f6]/20 transition-all shadow-sm">
