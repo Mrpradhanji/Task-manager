@@ -127,19 +127,15 @@ export async function getCurrentUser(req, res) {
 
 // UPDATE PROFILE
 export async function updateProfile(req, res) {
-    const { name, email } = req.body;
-    if (!name || !email || !validator.isEmail(email)) {
-        return res.status(400).json({ success: false, message: "Valid name and email required." });
+    const { name } = req.body;
+    if (!name || name.trim().length === 0) {
+        return res.status(400).json({ success: false, message: "Name is required." });
     }
     try {
-        const exists = await User.findOne({ email, _id: { $ne: req.user.id } });
-        if (exists) {
-            return res.status(409).json({ success: false, message: "Email already in use by another account." });
-        }
         const user = await User.findByIdAndUpdate(
             req.user.id,
-            { name, email },
-            { new: true, runValidators: true, select: "name email" }
+            { name },
+            { new: true, runValidators: true, select: "name email avatar" }
         );
         res.json({ success: true, user });
     } catch (err) {

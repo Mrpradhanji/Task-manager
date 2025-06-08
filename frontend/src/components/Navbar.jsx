@@ -9,6 +9,13 @@ export default function Navbar({ onLogout, user }) {
   const menuRef = useRef(null)
   const navigate = useNavigate()
 
+  // Function to get the full avatar URL
+  const getAvatarUrl = (avatar) => {
+    if (!avatar) return null
+    if (avatar.startsWith('http')) return avatar
+    return `http://localhost:4000${avatar}`
+  }
+
   const handleMenuToggle = () => setMenuOpen((prev) => !prev)
   const handleUserMenuToggle = () => setIsUserMenuOpen((prev) => !prev)
 
@@ -38,7 +45,10 @@ export default function Navbar({ onLogout, user }) {
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
       <div className="flex items-center justify-between px-4 py-3 md:px-6 max-w-7xl mx-auto">
         {/* Left - Logo + Brand */}
-        <div className="flex items-center gap-2">
+        <div 
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => navigate('/dashboard')}
+        >
           <ClipboardList className="w-6 h-6 text-indigo-600" />
           <span className="text-lg font-semibold text-gray-900">Task Manager</span>
         </div>
@@ -67,9 +77,12 @@ export default function Navbar({ onLogout, user }) {
               <div className="h-8 w-8 rounded-full overflow-hidden bg-indigo-100">
                 {user?.avatar ? (
                   <img
-                    src={user.avatar}
+                    src={getAvatarUrl(user.avatar)}
                     alt={user.name}
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`
+                    }}
                   />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center text-indigo-600 font-medium">
