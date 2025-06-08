@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Filter, SortDesc, SortAsc, Award, Plus, ListChecks, Clock } from 'lucide-react';
 import TaskItem from '../components/TaskItem';
@@ -13,46 +13,14 @@ const sortOptions = [
 ];
 
 const PendingTasks = () => {
-  const { tasks = [], refreshTasks } = useOutletContext();
-  const [localTasks, setLocalTasks] = useState(tasks);
-  const [sortBy, setSortBy] = useState('newest');
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const { tasks, updateTask } = useOutletContext();
+  const [sortBy, setSortBy] = React.useState('newest');
+  const [selectedTask, setSelectedTask] = React.useState(null);
+  const [showModal, setShowModal] = React.useState(false);
 
-  useEffect(() => {
-    setLocalTasks(tasks);
-  }, [tasks]);
-
-  const handleTaskUpdate = useCallback((updatedTask) => {
-    setLocalTasks(prevTasks => 
-      prevTasks.map(task => 
-        task._id === updatedTask._id ? updatedTask : task
-      )
-    );
-  }, []);
-
-  const getHeaders = () => {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('No auth token found');
-    return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
-  };
-
-  const handleDelete = useCallback(async (id) => {
-    await fetch(`${API_BASE}/${id}/gp`, { method: 'DELETE', headers: getHeaders() });
-    refreshTasks();
-  }, [refreshTasks]);
-
-  const handleToggleComplete = useCallback(async (id, completed) => {
-    await fetch(`${API_BASE}/${id}/gp`, {
-      method: 'PUT',
-      headers: getHeaders(),
-      body: JSON.stringify({ completed: completed ? 'Yes' : 'No' }),
-    });
-    refreshTasks();
-  }, [refreshTasks]);
-
+  // Memoize the sorted tasks to prevent unnecessary re-sorting
   const sortedPendingTasks = useMemo(() => {
-    return localTasks
+    return tasks
       .filter(task => ![true, 1, "yes"].includes(
         typeof task.completed === 'string' ? task.completed.toLowerCase() : task.completed
       ))
@@ -70,12 +38,26 @@ const PendingTasks = () => {
             return 0;
         }
       });
-  }, [localTasks, sortBy]);
+  }, [tasks, sortBy]);
 
-  const handleEdit = (task) => {
-    setSelectedTask(task);
-    setShowModal(true);
-  };
+  // Memoize the task count
+  const taskCount = useMemo(() => sortedPendingTasks.length, [sortedPendingTasks]);
+
+  // Memoize the task list
+  const taskList = useMemo(() => (
+    sortedPendingTasks.map(task => (
+      <TaskItem
+        key={task._id}
+        task={task}
+        onEdit={setSelectedTask}
+      />
+    ))
+  ), [sortedPendingTasks]);
+
+  const handleCloseModal = React.useCallback(() => {
+    setShowModal(false);
+    setSelectedTask(null);
+  }, []);
 
   return (
     <div className="p-4 md:p-6 min-h-screen overflow-hidden bg-[#f8fafc]">
@@ -85,7 +67,7 @@ const PendingTasks = () => {
             <ListChecks className="text-[#3b82f6] w-5 h-5 md:w-6 md:h-6" /> Pending Tasks
           </h1>
           <p className="text-sm text-[#64748b] mt-1 ml-7">
-            {sortedPendingTasks.length} task{sortedPendingTasks.length !== 1 && 's'} needing your attention
+            {taskCount} task{taskCount !== 1 && 's'} needing your attention
           </p>
         </div>
         <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
@@ -134,7 +116,7 @@ const PendingTasks = () => {
       </div>
 
       <div className="space-y-4">
-        {sortedPendingTasks.length === 0 ? (
+        {taskCount === 0 ? (
           <div className="p-6 bg-white rounded-xl border border-gray-100 text-center shadow-sm">
             <div className="w-16 h-16 bg-[#3b82f6]/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Clock className="w-8 h-8 text-[#3b82f6]" />
@@ -149,25 +131,18 @@ const PendingTasks = () => {
             </button>
           </div>
         ) : (
-          sortedPendingTasks.map(task => (
-            <TaskItem
-              key={task._id}
-              task={task}
-              onTaskUpdate={handleTaskUpdate}
-              onEdit={handleEdit}
-            />
-          ))
+          taskList
         )}
       </div>
 
       <TaskModal
         isOpen={!!selectedTask || showModal}
-        onClose={() => { setShowModal(false); setSelectedTask(null); }}
+        onClose={handleCloseModal}
         taskToEdit={selectedTask}
-        onSave={handleTaskUpdate}
+        onSave={updateTask}
       />
     </div>
   );
 };
 
-export default PendingTasks;
+export default React.memo(PendingTasks);

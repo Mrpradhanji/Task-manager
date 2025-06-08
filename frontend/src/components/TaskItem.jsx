@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import axios from "axios"
+import { useOutletContext } from "react-router-dom"
 import { format, isToday } from "date-fns"
 import TaskModal from "./AddTask"
 import { 
@@ -12,9 +12,8 @@ import {
 } from "../assets/dummy"
 import { CheckCircle2, MoreVertical, Clock, Calendar, ChevronDown } from "lucide-react"
 
-const API_BASE = "http://localhost:4000/api/tasks"
-
-const TaskItem = ({ task, onTaskUpdate, onLogout, showCompleteCheckbox = true }) => {
+const TaskItem = ({ task, onLogout, showCompleteCheckbox = true }) => {
+  const { updateTask } = useOutletContext();
   const [showMenu, setShowMenu] = useState(false)
   const [showStatusDropdown, setShowStatusDropdown] = useState(false)
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false)
@@ -69,12 +68,6 @@ const TaskItem = ({ task, onTaskUpdate, onLogout, showCompleteCheckbox = true })
     }
   }, [showMenu, showStatusDropdown, showPriorityDropdown])
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("token")
-    if (!token) throw new Error("No auth token found")
-    return { Authorization: `Bearer ${token}` }
-  }
-
   const handleAction = async (action) => {
     setShowMenu(false)
     switch (action) {
@@ -84,8 +77,7 @@ const TaskItem = ({ task, onTaskUpdate, onLogout, showCompleteCheckbox = true })
       case "delete":
         if (window.confirm("Are you sure you want to delete this task?")) {
           try {
-            await axios.delete(`${API_BASE}/${task._id}/gp`, { headers: getAuthHeaders() })
-            onTaskUpdate?.()
+            await updateTask(task._id, { deleted: true })
           } catch (err) {
             console.error(err)
             if (err.response?.status === 401) onLogout?.()
@@ -97,18 +89,9 @@ const TaskItem = ({ task, onTaskUpdate, onLogout, showCompleteCheckbox = true })
 
   const handleStatusChange = async (newStatus) => {
     try {
-      const response = await axios.put(
-        `${API_BASE}/${task._id}/gp`,
-        { status: newStatus },
-        { headers: getAuthHeaders() }
-      )
-      
-      if (response.data.success) {
-        setTaskStatus(newStatus)
-        setShowStatusDropdown(false)
-        // Update parent component with new task data
-        onTaskUpdate?.(response.data.task)
-      }
+      await updateTask(task._id, { status: newStatus })
+      setTaskStatus(newStatus)
+      setShowStatusDropdown(false)
     } catch (err) {
       console.error('Error updating status:', err)
       if (err.response?.status === 401) onLogout?.()
@@ -117,31 +100,12 @@ const TaskItem = ({ task, onTaskUpdate, onLogout, showCompleteCheckbox = true })
 
   const handlePriorityChange = async (newPriority) => {
     try {
-      // Close dropdown immediately for better UX
-      setShowPriorityDropdown(false)
-      
-      // Convert priority to proper case format expected by backend
       const formattedPriority = newPriority.charAt(0).toUpperCase() + newPriority.slice(1).toLowerCase()
-      
-      const response = await axios.put(
-        `${API_BASE}/${task._id}/gp`,
-        { priority: formattedPriority },
-        { headers: getAuthHeaders() }
-      )
-      
-      if (response.data.success) {
-        // Update local state with the formatted priority
-        setTaskPriority(formattedPriority.toUpperCase())
-        // Update parent component with new task data
-        onTaskUpdate?.(response.data.task)
-      } else {
-        // If update failed, revert the dropdown state
-        setShowPriorityDropdown(true)
-      }
+      await updateTask(task._id, { priority: formattedPriority })
+      setTaskPriority(formattedPriority.toUpperCase())
+      setShowPriorityDropdown(false)
     } catch (err) {
       console.error('Error updating priority:', err)
-      // If error occurs, revert the dropdown state
-      setShowPriorityDropdown(true)
       if (err.response?.status === 401) onLogout?.()
     }
   }
@@ -149,17 +113,8 @@ const TaskItem = ({ task, onTaskUpdate, onLogout, showCompleteCheckbox = true })
   const handleComplete = async () => {
     try {
       const newCompleted = !isCompleted
-      const response = await axios.put(
-        `${API_BASE}/${task._id}/gp`,
-        { completed: newCompleted ? "Yes" : "No" },
-        { headers: getAuthHeaders() }
-      )
-      
-      if (response.data.success) {
-        setIsCompleted(newCompleted)
-        // Update parent component with new task data
-        onTaskUpdate?.(response.data.task)
-      }
+      await updateTask(task._id, { completed: newCompleted ? "Yes" : "No" })
+      setIsCompleted(newCompleted)
     } catch (err) {
       console.error('Error updating completion:', err)
       if (err.response?.status === 401) onLogout?.()
@@ -170,13 +125,8 @@ const TaskItem = ({ task, onTaskUpdate, onLogout, showCompleteCheckbox = true })
     try {
       const payload = (({ title, description, priority, dueDate, completed, status }) =>
         ({ title, description, priority, dueDate, completed, status }))(updatedTask)
-      const response = await axios.put(`${API_BASE}/${task._id}/gp`, payload, { headers: getAuthHeaders() })
-      
-      if (response.data.success) {
-        setShowEditModal(false)
-        // Update parent component with new task data
-        onTaskUpdate?.(response.data.task)
-      }
+      await updateTask(task._id, payload)
+      setShowEditModal(false)
     } catch (err) {
       console.error('Error saving task:', err)
       if (err.response?.status === 401) onLogout?.()

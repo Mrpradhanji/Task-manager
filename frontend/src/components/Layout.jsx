@@ -36,7 +36,58 @@ const Layout = ({ user, onLogout }) => {
     }
   }, [onLogout])
 
+  // Initial fetch
   useEffect(() => { fetchTasks() }, [fetchTasks])
+
+  // Optimistic task update function
+  const updateTask = useCallback(async (taskId, updates) => {
+    // Store the previous state for rollback
+    const previousTasks = tasks;
+    
+    // Optimistically update the tasks
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task._id === taskId ? { ...task, ...updates } : task
+      )
+    );
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No auth token found");
+
+      const response = await axios.put(
+        `http://localhost:4000/api/tasks/${taskId}/gp`,
+        updates,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        // Update with the server response
+        setTasks(prevTasks => 
+          prevTasks.map(task => 
+            task._id === taskId ? response.data.task : task
+          )
+        );
+      } else {
+        // Revert on failure
+        setTasks(previousTasks);
+        throw new Error("Failed to update task");
+      }
+    } catch (err) {
+      // Revert on error
+      setTasks(previousTasks);
+      console.error("Error updating task:", err);
+      if (err.response?.status === 401) onLogout();
+      throw err;
+    }
+  }, [tasks, onLogout]);
+
+  // Memoized context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    tasks,
+    refreshTasks: fetchTasks,
+    updateTask
+  }), [tasks, fetchTasks, updateTask]);
 
   const stats = useMemo(() => {
     const completedTasks = tasks.filter(t => 
@@ -159,7 +210,7 @@ const Layout = ({ user, onLogout }) => {
       <div className="ml-0 xl:ml-64 lg:ml-64 md:ml-16 pt-16 p-3 sm:p-4 md:p-4 transition-all duration-300">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
           <div className="xl:col-span-2 space-y-3 sm:space-y-4">
-            <Outlet context={{ tasks, refreshTasks: fetchTasks }} />
+            <Outlet context={contextValue} />
           </div>
 
           <div className="xl:col-span-1 space-y-4 sm:space-y-6">
