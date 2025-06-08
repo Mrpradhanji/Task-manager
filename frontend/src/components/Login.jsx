@@ -21,14 +21,14 @@ const Login = ({ onSubmit, onSwitchMode }) => {
   }, []);
 
   const validateToken = async (token) => {
-    try {
+        try {
       const response = await fetch('http://localhost:4000/api/user/me', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
       if (response.ok) {
         const data = await response.json();
-        if (data.success) {
+          if (data.success) {
           onSubmit({
             email: data.user.email,
             name: data.user.name,
@@ -36,7 +36,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
             userId: data.user.id
           });
         }
-      }
+          }
     } catch (error) {
       console.error('Token validation failed:', error);
       localStorage.removeItem('token');
@@ -145,13 +145,13 @@ const Login = ({ onSubmit, onSwitchMode }) => {
               className="w-full px-4 py-2 bg-[#0A0A0A] border border-[#00FFFF]/20 rounded-lg text-white focus:outline-none focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF] transition-colors pr-10"
               placeholder="Enter your password"
             />
-            <button
-              type="button"
+              <button
+                type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#00FFFF] transition-colors"
-            >
+              >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
+              </button>
           </div>
         </div>
 
@@ -186,13 +186,13 @@ const Login = ({ onSubmit, onSwitchMode }) => {
 
         <div className="text-center text-sm">
           <span className="text-gray-400">Don't have an account? </span>
-          <button
-            type="button"
+        <button
+          type="button"
             onClick={onSwitchMode}
             className="text-[#00FFFF] hover:text-[#00FFFF]/80 font-medium transition-colors"
-          >
+        >
             Sign up
-          </button>
+        </button>
         </div>
       </form>
     </div>

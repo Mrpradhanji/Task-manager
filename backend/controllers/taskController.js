@@ -3,11 +3,12 @@ import Task from "../models/taskModel.js";
 // Create a new task
 export const createTask = async (req, res) => {
     try {
-        const { title, description, priority, dueDate, completed } = req.body;
+        const { title, description, priority, status, dueDate, completed } = req.body;
         const task = new Task({
             title,
             description,
             priority,
+            status: status || 'PENDING',
             dueDate,
             completed: completed === 'Yes' || completed === true,
             owner: req.user.id
@@ -47,6 +48,15 @@ export const updateTask = async (req, res) => {
         if (data.completed !== undefined) {
             data.completed = data.completed === 'Yes' || data.completed === true;
         }
+        // If status is being updated to COMPLETED, also set completed to true
+        if (data.status === 'COMPLETED') {
+            data.completed = true;
+        }
+        // If status is being updated to PENDING or IN_PROGRESS, and completed is not explicitly set, set it to false
+        else if (['PENDING', 'IN_PROGRESS'].includes(data.status) && data.completed === undefined) {
+            data.completed = false;
+        }
+        
         const updated = await Task.findOneAndUpdate(
             { _id: req.params.id, owner: req.user.id },
             data,

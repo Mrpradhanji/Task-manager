@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { Outlet } from "react-router-dom"
-import { Circle, TrendingUp, Zap, Clock } from "lucide-react"
+import { Circle, TrendingUp, Zap, Clock, CheckCircle2, AlertCircle, BarChart2 } from "lucide-react"
 import Navbar from "./Navbar"
 import Sidebar from "./Sidebar"
 import axios from "axios"
@@ -58,34 +58,92 @@ const Layout = ({ user, onLogout }) => {
     }
   }, [tasks])
 
-  const StatCard = ({ title, value, icon }) => (
-    <div className="p-3 rounded-xl bg-[#0A0A0A]/80 backdrop-blur-sm border border-[#00FFFF]/10 hover:border-[#00FFFF]/20 transition-all duration-300">
+  const StatCard = ({ title, value, icon, color = "blue", trend = null }) => (
+    <div className="p-3 rounded-xl bg-white border border-gray-100 hover:border-[#3b82f6]/20 transition-all shadow-sm">
       <div className="flex items-center gap-2">
-        <div className="p-1.5 rounded-lg bg-[#00FFFF]/10 text-[#00FFFF]">
+        <div className={`p-1.5 rounded-lg bg-${color}-100 text-${color}-600`}>
           {icon}
         </div>
-        <div>
-          <p className="text-lg font-bold text-white">{value}</p>
-          <p className="text-xs text-gray-400">{title}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-lg font-bold text-[#1e293b] truncate">{value}</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-xs text-[#64748b] truncate">{title}</p>
+            {trend && (
+              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                trend > 0 
+                  ? 'bg-green-100 text-green-700' 
+                  : trend < 0 
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-gray-100 text-gray-700'
+              }`}>
+                {trend > 0 ? '↑' : trend < 0 ? '↓' : '→'} {Math.abs(trend)}%
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>
   )
 
+  const CompletionChart = ({ completed, total }) => {
+    const percentage = total ? Math.round((completed / total) * 100) : 0
+    const segments = [
+      { label: 'Completed', value: completed, color: 'bg-[#22c55e]' },
+      { label: 'Pending', value: total - completed, color: 'bg-[#3b82f6]' }
+    ]
+
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <BarChart2 className="w-4 h-4 text-[#3b82f6]" />
+            <span className="text-sm font-medium text-[#1e293b]">Task Progress</span>
+          </div>
+          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#3b82f6]/10 text-[#3b82f6]">
+            {percentage}%
+          </span>
+        </div>
+
+        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+          {segments.map((segment, index) => (
+            <div
+              key={segment.label}
+              className={`h-full ${segment.color} transition-all duration-500`}
+              style={{ 
+                width: `${(segment.value / total) * 100}%`,
+                marginLeft: index === 0 ? '0' : '-2px'
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between text-xs">
+          {segments.map(segment => (
+            <div key={segment.label} className="flex items-center gap-1.5">
+              <div className={`w-2 h-2 rounded-full ${segment.color}`} />
+              <span className="text-[#64748b]">{segment.label}</span>
+              <span className="font-medium text-[#1e293b]">{segment.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   if (loading) return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00FFFF]"></div>
+    <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#3b82f6]"></div>
     </div>
   )
 
   if (error) return (
-    <div className="min-h-screen bg-[#0A0A0A] p-6 flex items-center justify-center">
-      <div className="bg-[#0A0A0A]/80 backdrop-blur-sm text-red-400 p-4 rounded-xl border border-red-500/20 max-w-md">
+    <div className="min-h-screen bg-[#f8fafc] p-6 flex items-center justify-center">
+      <div className="bg-white text-[#ef4444] p-4 rounded-xl border border-[#ef4444]/20 max-w-md shadow-sm">
         <p className="font-medium mb-2">Error loading tasks</p>
-        <p className="text-sm">{error}</p>
+        <p className="text-sm text-[#64748b]">{error}</p>
         <button
           onClick={fetchTasks}
-          className="mt-4 px-4 py-2 bg-red-500/10 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-colors border border-red-500/20"
+          className="mt-4 px-4 py-2 bg-[#ef4444]/10 text-[#ef4444] rounded-lg text-sm font-medium hover:bg-[#ef4444]/20 transition-colors border border-[#ef4444]/20"
         >
           Try Again
         </button>
@@ -94,7 +152,7 @@ const Layout = ({ user, onLogout }) => {
   )
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A]">
+    <div className="min-h-screen bg-[#f8fafc]">
       <Navbar user={user} onLogout={onLogout} />
       <Sidebar user={user} tasks={tasks}/>
 
@@ -105,83 +163,71 @@ const Layout = ({ user, onLogout }) => {
           </div>
 
           <div className="xl:col-span-1 space-y-4 sm:space-y-6">
-            <div className="bg-[#0A0A0A]/80 backdrop-blur-sm rounded-xl p-4 sm:p-5 shadow-lg shadow-[#00FFFF]/5 border border-[#00FFFF]/10">
-              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-white flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FFFF]" />
-                Task Statistics
+            <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 text-[#1e293b] flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#3b82f6]" />
+                Task Analytics
               </h3>
 
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
                 <StatCard 
                   title="Total Tasks" 
                   value={stats.totalCount} 
-                  icon={<Circle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00FFFF]" />} 
+                  icon={<Circle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                  color="blue"
+                  trend={5} // Example trend - you can calculate this based on historical data
                 />
                 <StatCard 
                   title="Completed" 
                   value={stats.completedTasks} 
-                  icon={<Circle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />} 
+                  icon={<CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                  color="green"
+                  trend={8}
                 />
                 <StatCard 
                   title="Pending" 
                   value={stats.pendingCount} 
-                  icon={<Circle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00FFFF]" />} 
+                  icon={<AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                  color="blue"
+                  trend={-3}
                 />
                 <StatCard
                   title="Completion Rate"
                   value={`${stats.completionPercentage}%`}
-                  icon={<Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00FFFF]" />}
+                  icon={<Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                  color="blue"
+                  trend={stats.completionPercentage > 50 ? 12 : -5}
                 />
               </div>
 
-              <hr className="my-3 sm:my-4 border-[#00FFFF]/10" />
+              <hr className="my-4 border-gray-100" />
 
-              <div className="space-y-2 sm:space-y-3">
-                <div className="flex items-center justify-between text-gray-300">
-                  <span className="text-xs sm:text-sm font-medium flex items-center gap-1.5">
-                    <Circle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#00FFFF] fill-[#00FFFF]" />
-                    Task Progress
-                  </span>
-                  <span className="text-xs bg-[#00FFFF]/10 text-[#00FFFF] px-1.5 py-0.5 sm:px-2 rounded-full">
-                    {stats.completedTasks}/{stats.totalCount}
-                  </span>
-                </div>
-                <div className="relative pt-1">
-                  <div className="flex gap-1.5 items-center">
-                    <div className="flex-1 h-2 sm:h-3 bg-[#00FFFF]/10 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#00FFFF] transition-all duration-500"
-                        style={{ width: `${stats.completionPercentage}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <CompletionChart completed={stats.completedTasks} total={stats.totalCount} />
             </div>
 
-            <div className="bg-[#0A0A0A]/80 backdrop-blur-sm rounded-xl p-4 sm:p-5 shadow-lg shadow-[#00FFFF]/5 border border-[#00FFFF]/10">
-              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-white flex items-center gap-2">
-                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FFFF]" />
+            <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-100">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 text-[#1e293b] flex items-center gap-2">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-[#3b82f6]" />
                 Recent Activity
               </h3>
               <div className="space-y-2 sm:space-y-3">
                 {tasks.slice(0, 3).map((task) => (
                   <div
                     key={task._id || task.id}
-                    className="flex items-center justify-between p-2 sm:p-3 hover:bg-[#00FFFF]/5 rounded-lg transition-colors duration-200 border border-transparent hover:border-[#00FFFF]/10"
+                    className="flex items-center justify-between p-2 sm:p-3 hover:bg-[#3b82f6]/5 rounded-lg transition-colors duration-200 border border-transparent hover:border-[#3b82f6]/20"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-300 break-words whitespace-normal">
+                      <p className="text-sm font-medium text-[#1e293b] break-words whitespace-normal">
                         {task.title}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className="text-xs text-[#64748b] mt-0.5">
                         {task.createdAt ? new Date(task.createdAt).toLocaleDateString() : "No date"}
                       </p>
                     </div>
                     <span className={`px-2 py-1 text-xs rounded-full shrink-0 ml-2 ${
                       task.completed 
-                        ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
-                        : 'bg-[#00FFFF]/10 text-[#00FFFF] border border-[#00FFFF]/20'
+                        ? 'bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20' 
+                        : 'bg-[#3b82f6]/10 text-[#3b82f6] border border-[#3b82f6]/20'
                     }`}>
                       {task.completed ? "Done" : "Pending"}
                     </span>
@@ -189,11 +235,11 @@ const Layout = ({ user, onLogout }) => {
                 ))}
                 {tasks.length === 0 && (
                   <div className="text-center py-4 sm:py-6 px-2">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-[#00FFFF]/10 flex items-center justify-center">
-                      <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-[#00FFFF]" />
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-[#3b82f6]/10 flex items-center justify-center">
+                      <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-[#3b82f6]" />
                     </div>
-                    <p className="text-sm text-gray-400">No recent activity</p>
-                    <p className="text-xs text-gray-500 mt-1">Tasks will appear here</p>
+                    <p className="text-sm text-[#64748b]">No recent activity</p>
+                    <p className="text-xs text-[#64748b] mt-1">Tasks will appear here</p>
                   </div>
                 )}
               </div>

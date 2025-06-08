@@ -80,8 +80,8 @@ const SignUp = ({ onSubmit, onSwitchMode }) => {
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-lg text-sm">
             {error}
-          </div>
-        )}
+        </div>
+      )}
 
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">

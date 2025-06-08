@@ -110,10 +110,10 @@ const App = () => {
       return <Navigate to="/login" replace />;
     }
     return (
-      <Layout user={currentUser} onLogout={handleLogout}>
-        <Outlet />
-      </Layout>
-    );
+    <Layout user={currentUser} onLogout={handleLogout}>
+      <Outlet />
+    </Layout>
+  );
   };
 
   return (
@@ -131,9 +131,9 @@ const App = () => {
           currentUser ? (
             <Navigate to="/dashboard" replace />
           ) : (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <Login onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/signup')} />
-            </div>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <Login onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/signup')} />
+          </div>
           )
         }
       />
@@ -144,9 +144,9 @@ const App = () => {
           currentUser ? (
             <Navigate to="/dashboard" replace />
           ) : (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <SignUp onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/login')} />
-            </div>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <SignUp onSubmit={handleAuthSubmit} onSwitchMode={() => navigate('/login')} />
+          </div>
           )
         }
       />
@@ -158,10 +158,8 @@ const App = () => {
         <Route index element={<Dashboard />} />
         <Route path="pending" element={<Pending />} />
         <Route path="complete" element={<Complete />} />
-        <Route
-          path="profile"
-          element={<Profile user={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout} />}
-        />
+        <Route path="settings" element={<Profile user={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout} />} />
+        <Route path="profile" element={<Profile user={currentUser} setCurrentUser={setCurrentUser} onLogout={handleLogout} />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

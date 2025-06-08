@@ -8,6 +8,7 @@ import {
     MoreVertical,
     Clock,
     Calendar,
+    RefreshCw,
 } from "lucide-react"
 
 // BACKEND TEST 
@@ -108,9 +109,9 @@ export const SIDEBAR_CLASSES = {
 }
 
 export const LINK_CLASSES = {
-    base: "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium",
-    active: "bg-[#00FFFF]/10 text-[#00FFFF] border border-[#00FFFF]/20",
-    inactive: "text-gray-400 hover:text-white hover:bg-[#00FFFF]/5 border border-transparent hover:border-[#00FFFF]/10",
+    base: "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 text-sm font-semibold",
+    active: "bg-[#3b82f6] text-white shadow-sm hover:bg-[#2563eb]",
+    inactive: "text-[#1e293b] hover:bg-[#3b82f6]/10 hover:text-[#3b82f6]",
     icon: "w-5 h-5",
     text: "whitespace-nowrap"
 }
@@ -264,7 +265,8 @@ export const layoutClasses = {
 
 // Menu options for task actions
 export const MENU_OPTIONS = [
-    { action: "edit", label: "Edit Task", icon: <Edit2 size={14} className="text-purple-600" /> },
+    { action: "edit", label: "Edit Task", icon: <Edit2 size={14} className="text-[#3b82f6]" /> },
+    { action: "status", label: "Change Status", icon: <RefreshCw size={14} className="text-[#3b82f6]" /> },
     { action: "delete", label: "Delete Task", icon: <Trash2 size={14} className="text-red-600" /> },
 ]
 
@@ -285,4 +287,17 @@ export const TI_CLASSES = {
     menuDropdown: "absolute right-0 mt-1 w-40 sm:w-48 bg-white border border-purple-100 rounded-xl shadow-lg z-10 overflow-hidden animate-fadeIn",
     dateRow: "flex items-center gap-1.5 text-xs font-medium whitespace-nowrap",
     createdRow: "flex items-center gap-1.5 text-xs text-gray-400 whitespace-nowrap",
+}
+
+// Task Status and Priority Tags
+export const TASK_STATUS = {
+    PENDING: { label: 'Pending', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
+    IN_PROGRESS: { label: 'In Progress', color: 'bg-blue-100 text-blue-700 border-blue-200' },
+    COMPLETED: { label: 'Completed', color: 'bg-green-100 text-green-700 border-green-200' }
+}
+
+export const PRIORITY_TAGS = {
+    HIGH: { label: 'High Priority', color: 'bg-red-100 text-red-700 border-red-200' },
+    MEDIUM: { label: 'Medium Priority', color: 'bg-orange-100 text-orange-700 border-orange-200' },
+    LOW: { label: 'Low Priority', color: 'bg-green-100 text-green-700 border-green-200' }
 }
