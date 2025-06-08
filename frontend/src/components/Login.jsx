@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 const Login = ({ onSubmit, onSwitchMode }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -11,6 +12,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -18,7 +20,13 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     if (token) {
       validateToken(token);
     }
-  }, []);
+    // Check for success message in location state
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      // Clear the message from location state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const validateToken = async (token) => {
         try {
@@ -111,6 +119,11 @@ const Login = ({ onSubmit, onSwitchMode }) => {
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-lg text-sm">
             {error}
+          </div>
+        )}
+        {successMessage && (
+          <div className="bg-green-500/10 border border-green-500/20 text-green-500 px-4 py-3 rounded-lg text-sm">
+            {successMessage}
           </div>
         )}
 

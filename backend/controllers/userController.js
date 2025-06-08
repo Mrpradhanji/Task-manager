@@ -203,20 +203,17 @@ export async function forgotPassword(req, res) {
 // RESET PASSWORD
 export async function resetPassword(req, res) {
     const { token, newPassword } = req.body;
-    console.log('Reset password request received:', { token: token?.substring(0, 10) + '...', hasPassword: !!newPassword });
     
     if (!token || !newPassword || newPassword.length < 8) {
-        console.log('Invalid request data:', { hasToken: !!token, passwordLength: newPassword?.length });
         return res.status(400).json({ success: false, message: "Invalid token or password." });
     }
 
     try {
+        // Find user with valid reset token
         const user = await User.findOne({
             resetToken: token,
             resetTokenExpiry: { $gt: Date.now() }
         });
-
-        console.log('User found:', !!user);
 
         if (!user) {
             return res.status(400).json({ success: false, message: "Invalid or expired reset token." });
@@ -228,7 +225,6 @@ export async function resetPassword(req, res) {
         user.resetTokenExpiry = undefined;
         await user.save();
 
-        console.log('Password reset successful for user:', user.email);
         res.json({ success: true, message: "Password has been reset successfully." });
     } catch (err) {
         console.error('Error in resetPassword:', err);

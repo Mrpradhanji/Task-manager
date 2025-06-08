@@ -15,32 +15,26 @@ const ResetPassword = () => {
   const token = searchParams.get('token');
 
   useEffect(() => {
-    console.log('Reset Password Component Mounted');
-    console.log('Token from URL:', token);
-    
     if (!token) {
-      console.log('No token found in URL');
       setMessage({
         type: 'error',
         text: 'Invalid or missing reset token. Please request a new password reset link.'
       });
-    } else {
-      console.log('Token found in URL');
     }
   }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted');
-    console.log('Token:', token);
     
     if (!token) {
-      console.log('No token available for submission');
+      setMessage({
+        type: 'error',
+        text: 'Invalid or missing reset token. Please request a new password reset link.'
+      });
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      console.log('Passwords do not match');
       setMessage({
         type: 'error',
         text: 'Passwords do not match'
@@ -49,7 +43,6 @@ const ResetPassword = () => {
     }
 
     if (formData.password.length < 8) {
-      console.log('Password too short');
       setMessage({
         type: 'error',
         text: 'Password must be at least 8 characters long'
@@ -61,21 +54,18 @@ const ResetPassword = () => {
     setMessage({ type: '', text: '' });
 
     try {
-      console.log('Sending reset password request to backend');
       const response = await fetch('http://localhost:4000/api/user/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          token,
+          token: token,
           newPassword: formData.password
         })
       });
 
       const data = await response.json();
-      console.log('Backend response:', data);
 
       if (response.ok) {
-        console.log('Password reset successful');
         setMessage({
           type: 'success',
           text: 'Password has been reset successfully. Redirecting to login...'
@@ -85,11 +75,9 @@ const ResetPassword = () => {
           navigate('/login');
         }, 3000);
       } else {
-        console.log('Password reset failed:', data.message);
         throw new Error(data.message || 'Failed to reset password');
       }
     } catch (error) {
-      console.error('Error during password reset:', error);
       setMessage({
         type: 'error',
         text: error.message || 'An error occurred. Please try again.'
@@ -157,6 +145,7 @@ const ResetPassword = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
+                minLength="8"
                 className="w-full px-4 py-2 bg-[#0A0A0A] border border-[#00FFFF]/20 rounded-lg text-white focus:outline-none focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF] transition-colors pr-10"
                 placeholder="Enter new password"
               />
@@ -174,16 +163,19 @@ const ResetPassword = () => {
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
               Confirm New Password
             </label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 bg-[#0A0A0A] border border-[#00FFFF]/20 rounded-lg text-white focus:outline-none focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF] transition-colors"
-              placeholder="Confirm new password"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                minLength="8"
+                className="w-full px-4 py-2 bg-[#0A0A0A] border border-[#00FFFF]/20 rounded-lg text-white focus:outline-none focus:border-[#00FFFF] focus:ring-1 focus:ring-[#00FFFF] transition-colors pr-10"
+                placeholder="Confirm new password"
+              />
+            </div>
           </div>
 
           <button
@@ -200,16 +192,6 @@ const ResetPassword = () => {
               'Reset Password'
             )}
           </button>
-
-          <div className="text-center text-sm">
-            <button
-              type="button"
-              onClick={() => navigate('/login')}
-              className="text-[#00FFFF] hover:text-[#00FFFF]/80 font-medium transition-colors"
-            >
-              Back to Login
-            </button>
-          </div>
         </form>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserPlus, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = ({ onSubmit, onSwitchMode }) => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const SignUp = ({ onSubmit, onSwitchMode }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,12 +43,13 @@ const SignUp = ({ onSubmit, onSwitchMode }) => {
       }
 
       if (data.success && data.token) {
-        localStorage.setItem('token', data.token);
-        onSubmit({
-          email: data.user.email,
-          name: data.user.name,
-          token: data.token,
-          userId: data.user.id
+        localStorage.removeItem('token');
+        localStorage.removeItem('currentUser');
+        setError('');
+        navigate('/login', { 
+          state: { 
+            message: 'Registration successful! Please sign in to continue.' 
+          }
         });
       } else {
         throw new Error('Invalid response from server');
