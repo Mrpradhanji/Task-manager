@@ -80,6 +80,21 @@ export async function registerUser(req, res) {
         const hashed = await bcrypt.hash(password, 10);
         const user = await User.create({ name, email, password: hashed });
         const token = createToken(user._id);
+        
+        // Send welcome email
+        console.log('Registration successful, attempting to send welcome email to:', user.email);
+        try {
+            await emailService.sendWelcomeEmail(user);
+            console.log('Welcome email sent successfully during registration');
+        } catch (emailError) {
+            console.error('Failed to send welcome email during registration:', {
+                error: emailError.message,
+                code: emailError.code,
+                stack: emailError.stack
+            });
+            // Continue with registration even if email fails
+        }
+        
         res.status(201).json({ success: true, token, user: { id: user._id, name: user.name, email: user.email } });
     } catch (err) {
         console.error(err);
@@ -260,6 +275,14 @@ export async function googleAuth(req, res) {
                 googleId: payload.sub,
                 profilePicture: picture
             });
+            
+            // Send welcome email for new Google users
+            try {
+                await emailService.sendWelcomeEmail(user);
+            } catch (emailError) {
+                console.error('Failed to send welcome email:', emailError);
+                // Continue with authentication even if email fails
+            }
         } else if (!user.googleId) {
             // Link existing account with Google
             user.googleId = payload.sub;
@@ -320,4 +343,40 @@ export async function uploadAvatar(req, res) {
             res.status(500).json({ success: false, message: 'Error updating avatar' });
         }
     });
+}
+
+// REMOVE AVATAR
+export async function removeAvatar(req, res) {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // If user has an avatar, delete the file
+        if (user.avatar) {
+            const avatarPath = path.join(process.cwd(), user.avatar);
+            if (fs.existsSync(avatarPath)) {
+                fs.unlinkSync(avatarPath);
+            }
+        }
+
+        // Update user to remove avatar
+        user.avatar = undefined;
+        await user.save();
+
+        res.json({
+            success: true,
+            message: 'Avatar removed successfully',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: null
+            }
+        });
+    } catch (error) {
+        console.error('Error removing avatar:', error);
+        res.status(500).json({ success: false, message: 'Error removing avatar' });
+    }
 }

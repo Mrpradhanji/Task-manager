@@ -8,7 +8,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberMe: false
+    terms: false
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -56,8 +56,8 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     setError('');
     setIsLoading(true);
 
-    if (!formData.rememberMe) {
-      setError('Please check "Remember Me" to continue');
+    if (!formData.terms) {
+      setError('Please accept the Terms & Conditions to continue');
       setIsLoading(false);
       return;
     }
@@ -172,14 +172,14 @@ const Login = ({ onSubmit, onSwitchMode }) => {
           <div className="flex items-center">
             <input
               type="checkbox"
-              id="rememberMe"
-              name="rememberMe"
-              checked={formData.rememberMe}
+              id="terms"
+              name="terms"
+              checked={formData.terms}
               onChange={handleChange}
               className="h-4 w-4 rounded border-[#00FFFF]/20 bg-[#0A0A0A] text-[#00FFFF] focus:ring-[#00FFFF] focus:ring-offset-[#0A0A0A]"
             />
-            <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-300">
-              Remember me
+            <label htmlFor="terms" className="ml-2 block text-sm text-gray-300">
+              Terms & Conditions
             </label>
           </div>
           <button

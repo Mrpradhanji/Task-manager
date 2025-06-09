@@ -246,9 +246,55 @@ export default function Profile({ setCurrentUser, onLogout }) {
                   className="hidden"
                 />
               </div>
-              <p className="mt-2 text-sm text-gray-500">
-                Click to change profile picture
-              </p>
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={handleAvatarClick}
+                  className="text-sm text-green-600 hover:text-green-700"
+                >
+                  Change
+                </button>
+                {profile.avatar && !profile.avatar.includes('ui-avatars.com') && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const token = localStorage.getItem("token");
+                        if (!token) {
+                          navigate('/login');
+                          return;
+                        }
+
+                        const { data } = await axios.delete(
+                          `${API_URL}/api/user/avatar`,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${token}`
+                            }
+                          }
+                        );
+
+                        if (data.success) {
+                          const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=random`;
+                          setProfile(prev => ({
+                            ...prev,
+                            avatar: defaultAvatar
+                          }));
+                          setCurrentUser(prev => ({
+                            ...prev,
+                            avatar: defaultAvatar
+                          }));
+                          toast.success('Profile picture removed successfully');
+                        }
+                      } catch (error) {
+                        console.error('Error removing avatar:', error);
+                        toast.error(error.response?.data?.message || 'Failed to remove profile picture');
+                      }
+                    }}
+                    className="text-sm text-red-600 hover:text-red-700"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Name Field */}

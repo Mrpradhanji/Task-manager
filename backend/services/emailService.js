@@ -57,6 +57,64 @@ class EmailService {
             </div>
         `;
     }
+//  ---------------------------- *************************************************---------------------------------------// 
+//Need verified domain to send this email and i have notanay domain
+    // Send welcome email
+    async sendWelcomeEmail(user) {
+        console.log('Attempting to send welcome email to:', user.email);
+        console.log('Using from email:', this.fromEmail);
+        
+        try {
+            const response = await this.resend.emails.send({
+                from: this.fromEmail,
+                to: user.email,
+                subject: 'Welcome to RTASK!',
+                html: this.getWelcomeTemplate(user.name)
+            });
+            console.log('Welcome email sent successfully:', response);
+            return true;
+        } catch (error) {
+            console.error('Detailed error sending welcome email:', {
+                error: error.message,
+                code: error.code,
+                stack: error.stack
+            });
+            throw new Error('Failed to send welcome email');
+        }
+    }
+
+    // Welcome email template
+    getWelcomeTemplate(userName) {
+        return `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h1 style="color: #333; text-align: center;">Welcome to RTASK!</h1>
+                <p style="color: #666; font-size: 16px; line-height: 1.5;">
+                    Hello ${userName},
+                </p>
+                <p style="color: #666; font-size: 16px; line-height: 1.5;">
+                    Welcome to RTASK! We're excited to have you on board. RTASK is your new task management solution that will help you stay organized and productive.
+                </p>
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h2 style="color: #333; font-size: 18px;">Getting Started:</h2>
+                    <ul style="color: #666; font-size: 16px; line-height: 1.6;">
+                        <li>Create your first task</li>
+                        <li>Organize tasks into projects</li>
+                        <li>Set priorities and deadlines</li>
+                        <li>Collaborate with team members</li>
+                    </ul>
+                </div>
+                <p style="color: #666; font-size: 16px; line-height: 1.5;">
+                    If you have any questions or need assistance, our support team is here to help!
+                </p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                <p style="color: #999; font-size: 12px; text-align: center;">
+                    This is an automated message, please do not reply to this email.
+                </p>
+            </div>
+        `;
+    }
+
+    
 
     // Add more email templates and methods here as needed
     // For example:

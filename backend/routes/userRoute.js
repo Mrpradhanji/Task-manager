@@ -8,7 +8,8 @@ import {
     forgotPassword,
     resetPassword,
     googleAuth,
-    uploadAvatar
+    uploadAvatar,
+    removeAvatar
 } from '../controllers/userController.js';
 import authMiddleware from '../middleware/auth.js';
 
@@ -26,5 +27,6 @@ userRouter.get('/me', authMiddleware, getCurrentUser);
 userRouter.put('/profile', authMiddleware, updateProfile);
 userRouter.put('/password', authMiddleware, updatePassword);
 userRouter.post('/avatar', authMiddleware, uploadAvatar);
+userRouter.delete('/avatar', authMiddleware, removeAvatar);
 
 export default userRouter;
