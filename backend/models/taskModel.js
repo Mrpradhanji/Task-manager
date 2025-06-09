@@ -11,5 +11,8 @@ const taskSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+// Add compound unique index on title and owner
+taskSchema.index({ title: 1, owner: 1 }, { unique: true });
+
 const Task = mongoose.models.Task || mongoose.model('Task', taskSchema);
 export default Task;

@@ -10,6 +10,8 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     password: '',
     terms: false
   });
+
+  
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');

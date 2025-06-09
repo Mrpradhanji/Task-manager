@@ -22,13 +22,13 @@ const LandingPage = () => {
   const features = [
     {
       icon: <CheckCircle2 className="w-6 h-6" />,
-      title: "Smart Task Management",
-      description: "Organize your tasks with our intuitive drag-and-drop interface and smart categorization."
+      title: "Task Management",
+      description: "Create, edit, and manage your tasks with an easy-to-use interface and basic categorization."
     },
     {
       icon: <Clock className="w-6 h-6" />,
-      title: "Real-time Updates",
-      description: "Stay on top of your tasks with instant notifications and real-time progress tracking."
+      title: "Task Tracking",
+      description: "Monitor your tasks with due dates, priority levels, and completion status tracking."
     },
     {
       icon: <BarChart2 className="w-6 h-6" />,
@@ -36,9 +36,9 @@ const LandingPage = () => {
       description: "Visualize your productivity with detailed analytics and performance insights."
     },
     {
-      icon: <Users className="w-6 h-6" />,
-      title: "Team Collaboration",
-      description: "Work seamlessly with your team through shared tasks and real-time updates."
+      icon: <Bell className="w-6 h-6" />,
+      title: "Task Organization",
+      description: "Efficiently organize tasks with categories, priorities, and due dates for better productivity."
     },
     {
       icon: <Shield className="w-6 h-6" />,
@@ -47,8 +47,8 @@ const LandingPage = () => {
     },
     {
       icon: <Calendar className="w-6 h-6" />,
-      title: "Smart Scheduling",
-      description: "Plan your tasks efficiently with our intelligent scheduling system."
+      title: "Basic Scheduling",
+      description: "Set due dates and priorities for your tasks to manage your time effectively."
     }
   ]
 

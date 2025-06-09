@@ -199,12 +199,18 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
       return;
     }
 
+    // Final uniqueness check before submission
+    if (isDuplicateTitle(taskData.title)) {
+      setError('A task with this title already exists. Please choose a different title.');
+      return;
+    }
+
     if (titleError) {
       setError('Please choose a different title');
       return;
     }
 
-    if (taskData.dueDate < today) {
+    if (taskData.dueDate && taskData.dueDate < today) {
       setError('Due date cannot be in the past.');
       return;
     }
@@ -215,13 +221,17 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
       const isEdit = Boolean(taskData.id);
       const url = isEdit ? `${API_BASE}/${taskData.id}/gp` : `${API_BASE}/gp`;
       
+      // Format the due date to include time
+      const formattedDueDate = taskData.dueDate ? `${taskData.dueDate}T00:00:00.000Z` : null;
+      
       const resp = await fetch(url, {
         method: isEdit ? 'PUT' : 'POST',
         headers: getHeaders(),
         body: JSON.stringify({
           ...taskData,
           title: taskData.title.trim(),
-          priority: taskData.priority // Keep the capitalized value
+          priority: taskData.priority, // Keep the capitalized value
+          dueDate: formattedDueDate
         }),
       });
 
@@ -231,6 +241,11 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
           return onLogout?.();
         }
         const err = await resp.json();
+        // Check for duplicate title error from backend
+        if (err.message && err.message.toLowerCase().includes('duplicate')) {
+          setError('A task with this title already exists. Please choose a different title.');
+          return;
+        }
         throw new Error(err.message || 'Failed to save task');
       }
 
@@ -249,7 +264,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
     } finally {
       setLoading(false);
     }
-  }, [taskData, today, getHeaders, onLogout, onSave, onClose, titleError]);
+  }, [taskData, today, getHeaders, onLogout, onSave, onClose, titleError, isDuplicateTitle]);
 
   if (!isOpen) return null;
 
