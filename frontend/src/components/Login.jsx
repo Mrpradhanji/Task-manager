@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Eye, EyeOff, Loader2, User, Mail, Lock } from 'lucide-react';
-import { FIELDS, Inputwrapper, BUTTONCLASSES, MESSAGE_ERROR } from "../assets/dummy"
-import config from "../config"
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 const Login = ({ onSubmit, onSwitchMode }) => {
   const navigate = useNavigate();
@@ -57,7 +55,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
+    setError('');
     setIsLoading(true);
 
     if (!formData.terms) {
@@ -67,12 +65,13 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     }
 
     try {
-      const response = await fetch(`${config.apiUrl}/api/user/login`, {
+      const response = await fetch('http://localhost:4000/api/user/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
       });
 
       const data = await response.json();
@@ -81,11 +80,23 @@ const Login = ({ onSubmit, onSwitchMode }) => {
         throw new Error(data.message || 'Login failed');
       }
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('currentUser', JSON.stringify(data.user));
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.message);
+      if (data.success && data.token) {
+        localStorage.setItem('token', data.token);
+        onSubmit({
+          email: data.user.email,
+          name: data.user.name,
+          token: data.token,
+          userId: data.user.id
+        });
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error.message || 'An error occurred during login');
+      // Clear any existing invalid tokens
+      localStorage.removeItem('token');
+      localStorage.removeItem('currentUser');
     } finally {
       setIsLoading(false);
     }
