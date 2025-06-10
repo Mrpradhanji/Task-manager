@@ -196,9 +196,9 @@ const LandingPage = () => {
                   <Sparkles className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#1e293b] mb-2">Boost Productivity</h3>
+                  <h3 className="text-xl font-semibold text-[#1e293b] mb-2">Smart Analytics</h3>
                   <p className="text-[#64748b]">
-                    Streamline your workflow and get more done with our intuitive task management system.
+                    Track your productivity with detailed analytics and visual insights into your task completion patterns.
                   </p>
                 </div>
               </div>
@@ -207,12 +207,12 @@ const LandingPage = () => {
             <div className="p-6 rounded-xl bg-white border border-gray-100">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center text-[#3b82f6]">
-                  <Bell className="w-6 h-6" />
+                  <Shield className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#1e293b] mb-2">Stay Updated</h3>
+                  <h3 className="text-xl font-semibold text-[#1e293b] mb-2">Secure & Private</h3>
                   <p className="text-[#64748b]">
-                    Never miss a deadline with real-time notifications and progress tracking.
+                    Your data is protected with enterprise-grade security and privacy features.
                   </p>
                 </div>
               </div>
