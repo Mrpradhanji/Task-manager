@@ -16,13 +16,6 @@ const createTask = async (req, res) => {
         const saved = await task.save();
         res.status(201).json({ success: true, task: saved });
     } catch (err) {
-        // Handle duplicate key error
-        if (err.code === 11000) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'A task with this title already exists' 
-            });
-        }
         res.status(400).json({ success: false, message: err.message });
     }
 };
@@ -72,13 +65,6 @@ const updateTask = async (req, res) => {
         if (!updated) return res.status(404).json({ success: false, message: 'Task not found or not yours' });
         res.json({ success: true, task: updated });
     } catch (err) {
-        // Handle duplicate key error
-        if (err.code === 11000) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'A task with this title already exists' 
-            });
-        }
         res.status(400).json({ success: false, message: err.message });
     }
 };

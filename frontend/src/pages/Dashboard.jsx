@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useOutletContext } from "react-router-dom"
-import { Plus, ClipboardList, CheckCircle2 } from "lucide-react"
+import { Plus, ListTodo, CheckCircle2 } from "lucide-react"
 import TaskModal from "../components/AddTask"
 import TaskItem from "../components/TaskItem"
 import Toast from "../components/Toast"
@@ -50,7 +50,10 @@ const Dashboard = () => {
 
       {/* Simple Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">My Tasks</h1>
+        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <ListTodo className="text-[#3b82f6] w-5 h-5 md:w-6 md:h-6" />
+          My Tasks
+        </h1>
         <button 
           onClick={() => setShowModal(true)}
           className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
@@ -75,7 +78,7 @@ const Dashboard = () => {
       ) : (
         <div className="flex flex-col items-center justify-center py-12 px-4">
           <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
-            <ClipboardList className="w-12 h-12 text-indigo-600" />
+            <ListTodo className="w-12 h-12 text-indigo-600" />
           </div>
           <h2 className="text-xl font-semibold text-gray-800 mb-2">No Tasks Yet</h2>
           <p className="text-gray-600 text-center mb-6 max-w-md">
