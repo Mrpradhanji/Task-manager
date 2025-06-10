@@ -12,8 +12,15 @@ const Settings = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-8">Settings</h1>
+    <div className="p-4 md:p-6 min-h-screen overflow-hidden bg-[#f8fafc]">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+        <div className="min-w-0">
+          <h1 className="text-xl md:text-3xl font-bold text-[#1e293b] flex items-center gap-2">
+            <span className="truncate">Settings</span>
+          </h1>
+        </div>
+      </div>
       
       <div className="space-y-8">
         {/* Danger Zone */}

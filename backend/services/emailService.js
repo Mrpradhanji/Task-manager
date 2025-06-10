@@ -10,8 +10,9 @@ class EmailService {
     async sendPasswordResetEmail(user, resetToken) {
         const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}`;
         
-        // Log the reset URL for verification (remove in production)
-        console.log('Reset URL:', resetUrl);
+        // Log the reset URL for verification
+        console.log('Generated reset URL:', resetUrl);
+        console.log('Reset token length:', resetToken.length);
         
         try {
             await this.resend.emails.send({
@@ -20,6 +21,7 @@ class EmailService {
                 subject: 'Reset Your RTASK Password',
                 html: this.getPasswordResetTemplate(user.name, resetUrl)
             });
+            console.log('Reset email sent successfully to:', user.email);
             return true;
         } catch (error) {
             console.error('Error sending password reset email:', error);

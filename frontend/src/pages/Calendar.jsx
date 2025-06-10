@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay } from 'date-fns';
-import { ChevronLeft, ChevronRight, CheckCircle2, Clock, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckCircle2, Clock, Calendar as CalendarIcon, X } from 'lucide-react';
 
 const Calendar = () => {
   const { tasks } = useOutletContext();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showModal, setShowModal] = useState(false);
+  const [modalDate, setModalDate] = useState(null);
 
   // Add console.log to debug
   console.log('Calendar Component - Tasks:', tasks);
@@ -35,6 +37,15 @@ const Calendar = () => {
 
   const nextMonth = () => {
     setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1));
+  };
+
+  const handleDateClick = (day) => {
+    setSelectedDate(day);
+    const tasksForDay = getTasksForDate(day);
+    if (tasksForDay.length > 2) {
+      setModalDate(day);
+      setShowModal(true);
+    }
   };
 
   return (
@@ -93,17 +104,25 @@ const Calendar = () => {
             return (
               <button
                 key={day.toString()}
-                onClick={() => setSelectedDate(day)}
+                onClick={() => handleDateClick(day)}
                 className={`
-                  relative p-2 h-24 text-left rounded-lg transition-all
+                  relative p-2 h-24 text-left rounded-lg transition-all overflow-hidden group
                   ${isCurrentMonth ? 'hover:bg-[#3b82f6]/5' : 'opacity-50'}
                   ${isSelected ? 'bg-[#3b82f6]/10 border border-[#3b82f6]' : ''}
                   ${isCurrentDay ? 'font-bold text-[#3b82f6]' : 'text-[#1e293b]'}
+                  ${tasksForDay.length > 2 ? 'hover:ring-2 hover:ring-[#3b82f6]' : ''}
                 `}
               >
-                <span className="text-sm">{format(day, 'd')}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">{format(day, 'd')}</span>
+                  {tasksForDay.length > 2 && (
+                    <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-[#3b82f6]/10 text-[#3b82f6]">
+                      {tasksForDay.length}
+                    </span>
+                  )}
+                </div>
                 {tasksForDay.length > 0 && (
-                  <div className="mt-1 space-y-1">
+                  <div className="mt-1 space-y-1 max-h-[calc(100%-2rem)] overflow-hidden">
                     {tasksForDay.slice(0, 2).map(task => (
                       <div
                         key={task._id}
@@ -116,8 +135,8 @@ const Calendar = () => {
                       </div>
                     ))}
                     {tasksForDay.length > 2 && (
-                      <div className="text-xs text-[#64748b]">
-                        +{tasksForDay.length - 2} more
+                      <div className="text-xs text-[#64748b] cursor-pointer hover:text-[#3b82f6] bg-gray-50 rounded flex items-center justify-center py-1">
+                        View {tasksForDay.length - 2} more
                       </div>
                     )}
                   </div>
@@ -128,8 +147,52 @@ const Calendar = () => {
         </div>
       </div>
 
+      {/* Tasks Modal */}
+      {showModal && modalDate && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-lg w-full max-h-[80vh] overflow-hidden">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-[#1e293b]">
+                Tasks for {format(modalDate, 'MMMM d, yyyy')}
+              </h3>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-[#64748b]" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto max-h-[calc(80vh-4rem)]">
+              <div className="space-y-3">
+                {getTasksForDate(modalDate).map(task => (
+                  <div
+                    key={task._id}
+                    className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-[#3b82f6]/20 transition-all"
+                  >
+                    <div className="flex items-center gap-3">
+                      {task.completed ? (
+                        <CheckCircle2 className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <Clock className="w-5 h-5 text-[#3b82f6]" />
+                      )}
+                      <div>
+                        <h4 className="font-medium text-[#1e293b]">{task.title}</h4>
+                        <p className="text-sm text-[#64748b]">{task.description}</p>
+                      </div>
+                    </div>
+                    <div className="text-xs font-medium px-2 py-1 rounded-full bg-[#3b82f6]/10 text-[#3b82f6]">
+                      {task.priority}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Selected Date Tasks */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mt-6">
         <h3 className="text-lg font-semibold text-[#1e293b] mb-4">
           Tasks for {format(selectedDate, 'MMMM d, yyyy')}
         </h3>

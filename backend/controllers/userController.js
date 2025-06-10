@@ -186,13 +186,17 @@ export async function updatePassword(req, res) {
 // FORGOT PASSWORD
 export async function forgotPassword(req, res) {
     const { email } = req.body;
+    console.log('Forgot password request for email:', email);
+    
     if (!email || !validator.isEmail(email)) {
+        console.log('Invalid email format:', email);
         return res.status(400).json({ success: false, message: "Valid email required." });
     }
 
     try {
         const user = await User.findOne({ email });
         if (!user) {
+            console.log('No user found for email:', email);
             // Don't reveal if email exists or not
             return res.json({ success: true, message: "If your email is registered, you will receive a password reset link." });
         }
@@ -201,12 +205,16 @@ export async function forgotPassword(req, res) {
         const resetToken = crypto.randomBytes(32).toString('hex');
         const resetTokenExpiry = Date.now() + 3600000; // 1 hour
 
+        console.log('Generated reset token:', resetToken);
+        console.log('Token expiry:', new Date(resetTokenExpiry).toISOString());
+
         user.resetToken = resetToken;
         user.resetTokenExpiry = resetTokenExpiry;
         await user.save();
 
         // Send reset email using email service
         await emailService.sendPasswordResetEmail(user, resetToken);
+        console.log('Reset email sent successfully to:', email);
 
         res.json({ success: true, message: "If your email is registered, you will receive a password reset link." });
     } catch (err) {
@@ -218,8 +226,11 @@ export async function forgotPassword(req, res) {
 // RESET PASSWORD
 export async function resetPassword(req, res) {
     const { token, newPassword } = req.body;
+    console.log('Reset password attempt with token:', token);
+    console.log('Token length:', token?.length);
     
     if (!token || !newPassword || newPassword.length < 8) {
+        console.log('Invalid request - missing token or password');
         return res.status(400).json({ success: false, message: "Invalid token or password." });
     }
 
@@ -231,8 +242,20 @@ export async function resetPassword(req, res) {
         });
 
         if (!user) {
-            return res.status(400).json({ success: false, message: "Invalid or expired reset token." });
+            // Let's check if the token exists but is expired
+            const expiredUser = await User.findOne({ resetToken: token });
+            if (expiredUser) {
+                console.log('Token found but expired for user:', expiredUser.email);
+                console.log('Token expiry:', new Date(expiredUser.resetTokenExpiry).toISOString());
+                return res.status(400).json({ success: false, message: "Reset token has expired. Please request a new one." });
+            }
+            
+            console.log('No user found with token');
+            return res.status(400).json({ success: false, message: "Invalid reset token. Please request a new password reset link." });
         }
+
+        console.log('Found user for token:', user.email);
+        console.log('Token expiry:', new Date(user.resetTokenExpiry).toISOString());
 
         // Update password and clear reset token
         user.password = await bcrypt.hash(newPassword, 10);
@@ -240,6 +263,7 @@ export async function resetPassword(req, res) {
         user.resetTokenExpiry = undefined;
         await user.save();
 
+        console.log('Password reset successful for user:', user.email);
         res.json({ success: true, message: "Password has been reset successfully." });
     } catch (err) {
         console.error('Error in resetPassword:', err);

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { Outlet } from "react-router-dom"
-import { Circle, TrendingUp, Zap, Clock, CheckCircle2, AlertCircle, BarChart2, ChevronRight } from "lucide-react"
+import { Circle, TrendingUp, Zap, Clock, CheckCircle2, AlertCircle, BarChart2 } from "lucide-react"
 import Navbar from "./Navbar"
 import Sidebar from "./Sidebar"
 import Analytics from "./Analytics"
@@ -87,12 +87,6 @@ const Layout = ({ user, onLogout }) => {
 
   // Add deleteTask function
   const deleteTask = useCallback(async (taskId) => {
-    // Store the previous state for rollback
-    const previousTasks = tasks;
-    
-    // Optimistically remove the task
-    setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
-
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No auth token found");
@@ -102,19 +96,17 @@ const Layout = ({ user, onLogout }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (!response.data.success) {
-        // Revert on failure
-        setTasks(previousTasks);
+      if (response.data.success) {
+        setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
+      } else {
         throw new Error("Failed to delete task");
       }
     } catch (err) {
-      // Revert on error
-      setTasks(previousTasks);
       console.error("Error deleting task:", err);
       if (err.response?.status === 401) onLogout();
       throw err;
     }
-  }, [tasks, onLogout]);
+  }, [onLogout]);
 
   const stats = useMemo(() => {
     const completedTasks = tasks.filter(t => 
@@ -167,78 +159,6 @@ const Layout = ({ user, onLogout }) => {
     deleteTask,
     user
   }), [tasks, fetchTasks, updateTask, deleteTask, user]);
-
-  const StatCard = ({ title, value, icon, color = "blue", trend = null }) => (
-    <div className="p-3 rounded-xl bg-white border border-gray-100 hover:border-[#3b82f6]/20 transition-all shadow-sm">
-      <div className="flex items-center gap-2">
-        <div className={`p-1.5 rounded-lg bg-${color}-100 text-${color}-600`}>
-          {icon}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-lg font-bold text-[#1e293b] truncate">{value}</p>
-          <div className="flex items-center gap-1.5">
-            <p className="text-xs text-[#64748b] truncate">{title}</p>
-            {trend && (
-              <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                trend > 0 
-                  ? 'bg-green-100 text-green-700' 
-                  : trend < 0 
-                    ? 'bg-red-100 text-red-700'
-                    : 'bg-gray-100 text-gray-700'
-              }`}>
-                {trend > 0 ? '↑' : trend < 0 ? '↓' : '→'} {Math.abs(trend)}%
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-
-  const CompletionChart = ({ completed, total }) => {
-    const percentage = total ? Math.round((completed / total) * 100) : 0
-    const segments = [
-      { label: 'Completed', value: completed, color: 'bg-[#22c55e]' },
-      { label: 'Pending', value: total - completed, color: 'bg-[#3b82f6]' }
-    ]
-
-    return (
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BarChart2 className="w-4 h-4 text-[#3b82f6]" />
-            <span className="text-sm font-medium text-[#1e293b]">Task Progress</span>
-          </div>
-          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#3b82f6]/10 text-[#3b82f6]">
-            {percentage}%
-          </span>
-        </div>
-
-        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-          {segments.map((segment, index) => (
-            <div
-              key={segment.label}
-              className={`h-full ${segment.color} transition-all duration-500`}
-              style={{ 
-                width: `${(segment.value / total) * 100}%`,
-                marginLeft: index === 0 ? '0' : '-2px'
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="flex items-center justify-between text-xs">
-          {segments.map(segment => (
-            <div key={segment.label} className="flex items-center gap-1.5">
-              <div className={`w-2 h-2 rounded-full ${segment.color}`} />
-              <span className="text-[#64748b]">{segment.label}</span>
-              <span className="font-medium text-[#1e293b]">{segment.value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
 
   if (loading) return (
     <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">

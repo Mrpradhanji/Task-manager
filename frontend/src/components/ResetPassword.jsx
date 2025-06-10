@@ -13,12 +13,25 @@ const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const token = searchParams.get('token');
+  console.log('Reset password page loaded with token:', token);
+  console.log('Token length:', token?.length);
 
   useEffect(() => {
     if (!token) {
+      console.log('No token found in URL');
       setMessage({
         type: 'error',
         text: 'Invalid or missing reset token. Please request a new password reset link.'
+      });
+      return;
+    }
+
+    // Validate token format
+    if (token.length !== 64) {
+      console.log('Invalid token length:', token.length);
+      setMessage({
+        type: 'error',
+        text: 'Invalid reset token format. Please request a new password reset link.'
       });
     }
   }, [token]);
@@ -27,6 +40,7 @@ const ResetPassword = () => {
     e.preventDefault();
     
     if (!token) {
+      console.log('Submit attempted without token');
       setMessage({
         type: 'error',
         text: 'Invalid or missing reset token. Please request a new password reset link.'
@@ -34,7 +48,17 @@ const ResetPassword = () => {
       return;
     }
 
+    if (token.length !== 64) {
+      console.log('Invalid token length on submit:', token.length);
+      setMessage({
+        type: 'error',
+        text: 'Invalid reset token format. Please request a new password reset link.'
+      });
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
+      console.log('Password mismatch');
       setMessage({
         type: 'error',
         text: 'Passwords do not match'
@@ -43,6 +67,7 @@ const ResetPassword = () => {
     }
 
     if (formData.password.length < 8) {
+      console.log('Password too short');
       setMessage({
         type: 'error',
         text: 'Password must be at least 8 characters long'
@@ -54,6 +79,9 @@ const ResetPassword = () => {
     setMessage({ type: '', text: '' });
 
     try {
+      console.log('Sending reset password request with token:', token);
+      console.log('Token length being sent:', token.length);
+      
       const response = await fetch('http://localhost:4000/api/user/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,6 +92,7 @@ const ResetPassword = () => {
       });
 
       const data = await response.json();
+      console.log('Reset password response:', data);
 
       if (response.ok) {
         setMessage({
@@ -78,6 +107,7 @@ const ResetPassword = () => {
         throw new Error(data.message || 'Failed to reset password');
       }
     } catch (error) {
+      console.error('Reset password error:', error);
       setMessage({
         type: 'error',
         text: error.message || 'An error occurred. Please try again.'

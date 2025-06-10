@@ -122,13 +122,9 @@ const TaskItem = ({ task, onLogout, showCompleteCheckbox = true }) => {
         ({ title, description, priority, dueDate, completed, status }))(updatedTask)
       const response = await updateTask(task._id, payload)
       if (response?.data?.task) {
-        // Update local task state with the response data
-        setTask(response.data.task)
         setTaskStatus(response.data.task.status)
         setTaskPriority(response.data.task.priority)
         setIsCompleted(response.data.task.completed === "Yes")
-        // Notify parent component about the update
-        onTaskUpdate?.(response.data.task)
       }
       setShowEditModal(false)
     } catch (err) {

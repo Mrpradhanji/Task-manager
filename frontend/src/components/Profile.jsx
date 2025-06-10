@@ -19,9 +19,9 @@ import "react-toastify/dist/ReactToastify.css"
 // Custom styles
 const SECTION_WRAPPER = "bg-white rounded-xl shadow-lg p-6"
 const INPUT_WRAPPER = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white text-gray-900 transition-colors"
-const FULL_BUTTON = "w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+const BUTTON = "inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
 const BACK_BUTTON = "flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
-const DANGER_BTN = "w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+const DANGER_BTN = "inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
 
 // Constants
 const API_URL = "http://localhost:4000"
@@ -330,14 +330,14 @@ export default function Profile({ setCurrentUser, onLogout }) {
                 </p>
               </div>
 
-              <div className="mt-6">
+              <div className="mt-6 flex justify-center">
                 <button
                   type="submit"
-                  className={FULL_BUTTON}
+                  className={BUTTON}
                 >
-                  <Save className="w-4 h-4" />
+                  <Save className="w-4 h-4 mr-2" />
                   Save Changes
-              </button>
+                </button>
               </div>
             </form>
           </div>
@@ -505,13 +505,15 @@ export default function Profile({ setCurrentUser, onLogout }) {
                       </button>
                     </div>
                   </div>
-                  <button
-                    type="submit"
-                    className={FULL_BUTTON}
-                  >
-                    <Shield className="w-4 h-4 mr-2" />
-                    Update Password
-              </button>
+                  <div className="flex justify-center">
+                    <button
+                      type="submit"
+                      className={BUTTON}
+                    >
+                      <Shield className="w-4 h-4 mr-2" />
+                      Update Password
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>
@@ -520,14 +522,16 @@ export default function Profile({ setCurrentUser, onLogout }) {
           {/* Danger Zone */}
           <div className={SECTION_WRAPPER}>
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Danger Zone</h2>
-            <button
-              onClick={onLogout}
-              className={DANGER_BTN}
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </button>
-              </div>
+            <div className="flex justify-center">
+              <button
+                onClick={onLogout}
+                className={DANGER_BTN}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
