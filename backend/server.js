@@ -43,6 +43,7 @@ connectDB();
 
 // Routes
 app.use("/api/user", userRouter);
+app.use('/api/auth', userRouter);
 app.use('/api/tasks', taskRouter);
 
 app.get('/', (req, res) => {

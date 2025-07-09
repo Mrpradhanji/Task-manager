@@ -271,67 +271,6 @@ export async function resetPassword(req, res) {
     }
 }
 
-// GOOGLE AUTH
-export async function googleAuth(req, res) {
-    const { token } = req.body;
-    if (!token) {
-        return res.status(400).json({ success: false, message: "Google token required." });
-    }
-
-    try {
-        // Verify Google token
-        const ticket = await googleClient.verifyIdToken({
-            idToken: token,
-            audience: process.env.GOOGLE_CLIENT_ID
-        });
-
-        const payload = ticket.getPayload();
-        const { email, name, picture } = payload;
-
-        // Find or create user
-        let user = await User.findOne({ email });
-        if (!user) {
-            // Create new user with Google info
-            user = await User.create({
-                email,
-                name,
-                password: crypto.randomBytes(16).toString('hex'), // Random password
-                googleId: payload.sub,
-                profilePicture: picture
-            });
-            
-            // Send welcome email for new Google users
-            try {
-                await emailService.sendWelcomeEmail(user);
-            } catch (emailError) {
-                console.error('Failed to send welcome email:', emailError);
-                // Continue with authentication even if email fails
-            }
-        } else if (!user.googleId) {
-            // Link existing account with Google
-            user.googleId = payload.sub;
-            user.profilePicture = picture;
-            await user.save();
-        }
-
-        // Create JWT token
-        const jwtToken = createToken(user._id);
-        res.json({
-            success: true,
-            token: jwtToken,
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                profilePicture: user.profilePicture
-            }
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(401).json({ success: false, message: "Invalid Google token." });
-    }
-}
-
 // UPLOAD AVATAR
 export async function uploadAvatar(req, res) {
     upload(req, res, async function(err) {

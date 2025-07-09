@@ -7,7 +7,6 @@ import {
     updatePassword,
     forgotPassword,
     resetPassword,
-    googleAuth,
     uploadAvatar,
     removeAvatar
 } from '../controllers/userController.js';
@@ -20,7 +19,6 @@ userRouter.post('/register', registerUser);
 userRouter.post('/login', loginUser);
 userRouter.post('/forgot-password', forgotPassword);
 userRouter.post('/reset-password', resetPassword);
-userRouter.post('/google-auth', googleAuth);
 
 // Protected
 userRouter.get('/me', authMiddleware, getCurrentUser);
