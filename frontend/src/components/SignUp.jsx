@@ -14,6 +14,8 @@ const SignUp = ({ onSubmit, onSwitchMode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -26,7 +28,7 @@ const SignUp = ({ onSubmit, onSwitchMode }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:4000/api/user/register', {
+      const response = await fetch(`${API_URL}/api/user/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

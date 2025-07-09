@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { PlusCircle, X, Save, Calendar, AlignLeft, Flag, CheckCircle, AlertCircle } from 'lucide-react';
 import { baseControlClasses, priorityStyles, DEFAULT_TASK, TASK_STATUS, PRIORITY_TAGS } from '../assets/dummy';
 
-const API_BASE = 'http://localhost:4000/api/tasks';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
   const [taskData, setTaskData] = useState(DEFAULT_TASK);
@@ -42,7 +42,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
         return;
       }
 
-      const response = await fetch(`${API_BASE}/check-title`, {
+      const response = await fetch(`${API_URL}/api/tasks/check-title`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
         }
         
         console.log('Fetching existing tasks...');
-        const response = await fetch(`${API_BASE}/gp`, {
+        const response = await fetch(`${API_URL}/api/tasks/gp`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -219,7 +219,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
     setError(null);
     try {
       const isEdit = Boolean(taskData.id);
-      const url = isEdit ? `${API_BASE}/${taskData.id}/gp` : `${API_BASE}/gp`;
+      const url = isEdit ? `${API_URL}/api/tasks/${taskData.id}/gp` : `${API_URL}/api/tasks/gp`;
       
       // Format the due date to include time
       const formattedDueDate = taskData.dueDate ? `${taskData.dueDate}T00:00:00.000Z` : null;

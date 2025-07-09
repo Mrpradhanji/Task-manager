@@ -8,6 +8,8 @@ const ForgotPassword = ({ onBackToLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // Get the current user's email if they're logged in
   useEffect(() => {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -22,7 +24,7 @@ const ForgotPassword = ({ onBackToLogin }) => {
     setMessage({ type: '', text: '' });
 
     try {
-      const response = await fetch('http://localhost:4000/api/user/forgot-password', {
+      const response = await fetch(`${API_URL}/api/user/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })

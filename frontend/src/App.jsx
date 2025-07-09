@@ -13,6 +13,8 @@ import LandingPage from './pages/LandingPage';
 import Calendar from './pages/Calendar';
 import './index.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const App = () => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(() => {
@@ -31,7 +33,7 @@ const App = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:4000/api/user/me', {
+        const response = await fetch(`${API_URL}/api/user/me`, {
           headers: { 
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
