@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { PlusCircle, X, Save, Calendar, AlignLeft, Flag, CheckCircle, AlertCircle } from 'lucide-react';
 import { baseControlClasses, priorityStyles, DEFAULT_TASK, TASK_STATUS, PRIORITY_TAGS } from '../assets/dummy';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = 'https://task-manager-3-37o6.onrender.com';
 
 const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
   const [taskData, setTaskData] = useState(DEFAULT_TASK);

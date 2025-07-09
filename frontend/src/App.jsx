@@ -13,7 +13,7 @@ import LandingPage from './pages/LandingPage';
 import Calendar from './pages/Calendar';
 import './index.css';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = 'https://task-manager-3-37o6.onrender.com';
 
 const App = () => {
   const navigate = useNavigate();
