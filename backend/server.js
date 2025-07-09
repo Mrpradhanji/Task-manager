@@ -31,6 +31,7 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: [
+    'https://task-manager-pearl-six-74.vercel.app',
     'https://task-manager-kappa-woad.vercel.app',
     'http://localhost:5173'
   ],
