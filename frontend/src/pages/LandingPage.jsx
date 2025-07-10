@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { CheckCircle2, BarChart2, Calendar, Users, Shield, Sparkles, ArrowRight, Quote, HelpCircle, Mail, Star, TrendingUp, Clock } from "lucide-react"
 import { motion, useAnimation, AnimatePresence } from "framer-motion"
-import { useState } from "react"
 
 const features = [
   { icon: <CheckCircle2 className="w-8 h-8 text-cyan-400" />, title: "Smart Task Management", description: "Create, edit, and organize your tasks with ease. Stay on top of your work with intuitive controls. Attach files, set priorities, and add notes to every task." },
@@ -84,6 +83,7 @@ const Counter = ({ value, suffix }) => {
 const LandingPage = () => {
   const navigate = useNavigate()
   const [openFaq, setOpenFaq] = useState(null)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-950 to-slate-900 text-slate-100">
@@ -94,7 +94,8 @@ const LandingPage = () => {
             <img src="/rtask-logo.svg" alt="RTASK Logo" className="w-8 h-8" />
             <span className="text-xl font-bold text-cyan-400">RTASK</span>
           </div>
-          <nav className="flex gap-6 items-center text-cyan-200 font-medium">
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex gap-6 items-center text-cyan-200 font-medium">
             <a href="#features" className="hover:text-cyan-400 transition-colors">Features</a>
             <a href="#how-it-works" className="hover:text-cyan-400 transition-colors">How It Works</a>
             <a href="#why-choose" className="hover:text-cyan-400 transition-colors">Why Choose Us</a>
@@ -102,7 +103,32 @@ const LandingPage = () => {
             <button onClick={() => navigate('/login')} className="px-4 py-1 border border-cyan-400 rounded-lg text-cyan-400 hover:bg-slate-800 transition-colors">Sign In</button>
             <button onClick={() => navigate('/signup')} className="px-4 py-1 bg-cyan-400 text-slate-900 rounded-lg hover:bg-cyan-500 transition-colors">Sign Up</button>
           </nav>
+          {/* Hamburger Icon for Mobile */}
+          <button
+            className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+            aria-label="Open navigation menu"
+          >
+            <svg className="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              {mobileNavOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
+        {/* Mobile Nav Menu */}
+        {mobileNavOpen && (
+          <nav className="md:hidden bg-slate-900/95 border-b border-slate-800 px-4 py-4 flex flex-col gap-4 text-cyan-200 font-medium animate-fade-in-down">
+            <a href="#features" className="hover:text-cyan-400 transition-colors" onClick={() => setMobileNavOpen(false)}>Features</a>
+            <a href="#how-it-works" className="hover:text-cyan-400 transition-colors" onClick={() => setMobileNavOpen(false)}>How It Works</a>
+            <a href="#why-choose" className="hover:text-cyan-400 transition-colors" onClick={() => setMobileNavOpen(false)}>Why Choose Us</a>
+            <a href="#faq" className="hover:text-cyan-400 transition-colors" onClick={() => setMobileNavOpen(false)}>FAQ</a>
+            <button onClick={() => { setMobileNavOpen(false); navigate('/login'); }} className="px-4 py-2 border border-cyan-400 rounded-lg text-cyan-400 hover:bg-slate-800 transition-colors">Sign In</button>
+            <button onClick={() => { setMobileNavOpen(false); navigate('/signup'); }} className="px-4 py-2 bg-cyan-400 text-slate-900 rounded-lg hover:bg-cyan-500 transition-colors">Sign Up</button>
+          </nav>
+        )}
       </header>
 
       <main className="flex-1 flex flex-col pt-20">
