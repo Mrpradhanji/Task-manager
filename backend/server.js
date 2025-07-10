@@ -33,7 +33,11 @@ app.use(cors({
   origin: [
     'https://task-manager-pearl-six-74.vercel.app',
     'https://task-manager-kappa-woad.vercel.app',
-    'http://localhost:5173'
+    'https://task-manager-3-37o6.vercel.app',
+    'https://task-manager.vercel.app',
+    'https://task-manager-git-main.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
   ],
   credentials: true
 }));

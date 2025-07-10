@@ -20,7 +20,7 @@ const Layout = ({ user, onLogout }) => {
       const token = localStorage.getItem("token")
       if (!token) throw new Error("No auth token found")
 
-      const { data } = await axios.get("http://localhost:4000/api/tasks/gp", {
+      const { data } = await axios.get("https://task-manager-3-37o6.onrender.com/api/tasks/gp", {
         headers: { Authorization: `Bearer ${token}` }
       })
 
@@ -58,7 +58,7 @@ const Layout = ({ user, onLogout }) => {
       if (!token) throw new Error("No auth token found");
 
       const response = await axios.put(
-        `http://localhost:4000/api/tasks/${taskId}/gp`,
+        `https://task-manager-3-37o6.onrender.com/api/tasks/${taskId}/gp`,
         updates,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -92,7 +92,7 @@ const Layout = ({ user, onLogout }) => {
       if (!token) throw new Error("No auth token found");
 
       const response = await axios.delete(
-        `http://localhost:4000/api/tasks/${taskId}/gp`,
+        `https://task-manager-3-37o6.onrender.com/api/tasks/${taskId}/gp`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

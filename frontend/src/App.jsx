@@ -48,7 +48,7 @@ const App = () => {
         const data = await response.json();
         if (data.success && data.user) {
           const avatarUrl = data.user.avatar 
-            ? `http://localhost:4000${data.user.avatar}`
+            ? `https://task-manager-3-37o6.onrender.com${data.user.avatar}`
             : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=random`;
 
           setCurrentUser(prev => ({
