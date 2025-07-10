@@ -31,6 +31,7 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: [
+    'https://task-manager-4-kf4p.onrender.com',
     'https://task-manager-pearl-six-74.vercel.app',
     'https://task-manager-kappa-woad.vercel.app',
     'https://task-manager-3-37o6.vercel.app',
