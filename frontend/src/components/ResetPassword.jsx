@@ -36,6 +36,34 @@ const ResetPassword = () => {
     }
   }, [token]);
 
+  // Fix: If token is present, do not redirect to home, just show error if invalid
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="bg-[#0A0A0A] p-8 rounded-lg shadow-lg w-full max-w-md border border-[#00FFFF]/20">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-white mb-4">Invalid Reset Link</h2>
+            <p className="text-gray-400 mb-6">The password reset link is invalid or has expired.</p>
+            <button
+              onClick={() => navigate('/forgot-password')}
+              className="text-[#00FFFF] hover:text-[#00FFFF]/80 font-medium transition-colors"
+            >
+              Request New Reset Link
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Fix: Remove any double slashes in the path except for the protocol
+  useEffect(() => {
+    if (window.location.pathname.startsWith('//')) {
+      const fixedPath = window.location.pathname.replace(/^\/\//, '/');
+      window.history.replaceState({}, '', fixedPath + window.location.search);
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -125,25 +153,6 @@ const ResetPassword = () => {
       [name]: value
     }));
   };
-
-  if (!token) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
-        <div className="bg-[#0A0A0A] p-8 rounded-lg shadow-lg w-full max-w-md border border-[#00FFFF]/20">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">Invalid Reset Link</h2>
-            <p className="text-gray-400 mb-6">The password reset link is invalid or has expired.</p>
-            <button
-              onClick={() => navigate('/forgot-password')}
-              className="text-[#00FFFF] hover:text-[#00FFFF]/80 font-medium transition-colors"
-            >
-              Request New Reset Link
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
