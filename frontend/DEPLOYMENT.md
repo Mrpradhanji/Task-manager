@@ -56,7 +56,7 @@ You can add a custom domain in the Vercel dashboard under your project settings.
 3. **CORS Errors**: Your backend CORS is already configured for Vercel domains
 
 ### Backend URL
-Your backend is deployed at: `https://task-manager-3-37o6.onrender.com`
+Your backend is deployed at: `https://task-manager-3-3rzq.onrender.com`
 
 All frontend API calls are already configured to use this URL.
 

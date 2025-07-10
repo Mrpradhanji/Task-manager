@@ -13,7 +13,7 @@ import LandingPage from './pages/LandingPage';
 import Calendar from './pages/Calendar';
 import './index.css';
 
-const API_URL = 'https://task-manager-3-37o6.onrender.com';
+const API_URL = 'https://task-manager-3-3rzq.onrender.com';
 
 const App = () => {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ const App = () => {
         const data = await response.json();
         if (data.success && data.user) {
           const avatarUrl = data.user.avatar 
-            ? `https://task-manager-3-37o6.onrender.com${data.user.avatar}`
+            ? `https://task-manager-3-3rzq.onrender.com${data.user.avatar}`
             : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=random`;
 
           setCurrentUser(prev => ({

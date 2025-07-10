@@ -8,7 +8,7 @@ const ForgotPassword = ({ onBackToLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  const API_URL = 'https://task-manager-3-37o6.onrender.com';
+  const API_URL = 'https://task-manager-3-3rzq.onrender.com';
 
   // Get the current user's email if they're logged in
   useEffect(() => {

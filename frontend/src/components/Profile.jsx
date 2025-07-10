@@ -24,7 +24,7 @@ const BACK_BUTTON = "flex items-center text-gray-600 hover:text-indigo-600 trans
 const DANGER_BTN = "inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
 
 // Constants
-const API_URL = "https://task-manager-3-37o6.onrender.com"
+const API_URL = "https://task-manager-3-3rzq.onrender.com"
 
 export default function Profile({ setCurrentUser, onLogout }) {
   const [profile, setProfile] = useState({ name: "", email: "", avatar: "" })

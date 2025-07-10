@@ -12,7 +12,7 @@ export default function Navbar({ onLogout, user }) {
   const getAvatarUrl = (avatar) => {
     if (!avatar) return null
     if (avatar.startsWith('http')) return avatar
-    return `https://task-manager-3-37o6.onrender.com${avatar}`
+    return `https://task-manager-3-3rzq.onrender.com${avatar}`
   }
 
   const handleMenuToggle = () => setMenuOpen((prev) => !prev)

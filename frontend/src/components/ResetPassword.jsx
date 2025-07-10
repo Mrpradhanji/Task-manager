@@ -82,7 +82,7 @@ const ResetPassword = () => {
       console.log('Sending reset password request with token:', token);
       console.log('Token length being sent:', token.length);
       
-      const API_URL = 'https://task-manager-3-37o6.onrender.com';
+      const API_URL = 'https://task-manager-3-3rzq.onrender.com';
       const response = await fetch(`${API_URL}/api/user/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

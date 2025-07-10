@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
-const API_URL = 'https://task-manager-3-37o6.onrender.com';
+const API_URL = 'https://task-manager-3-3rzq.onrender.com';
 
 const Login = ({ onSubmit, onSwitchMode }) => {
   const navigate = useNavigate();
